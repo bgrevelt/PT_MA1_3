@@ -29,7 +29,7 @@ testToRevDigits (n, d) = toRevDigits n == d
 
 ex2Tests :: [Test]
 ex2Tests = [ Test "toRevDigits test" testToRevDigits
-             [(123, [3, 2, 1]), (0, []), (-1, []), (5, [5]), 
+             [(123, [3, 2, 1]), (0, []), (-1, []), (5, [5]),
                (3219873218, [8, 1, 2, 3, 7, 8, 9, 1, 2, 3])
              ]
            ]
@@ -48,13 +48,25 @@ ex3Tests = [ Test "doubleEveryOther test" testDoubleEveryOther
 
 -- Exercise 4 -----------------------------------------
 
+testSumDigits:: ([Integer], Integer) -> Bool
+testSumDigits (n, d) = sumDigits n == d
+
 ex4Tests :: [Test]
-ex4Tests = []
+ex4Tests = [ Test "testSumDigits test" testSumDigits
+             [  ([ 1, 2, 10, 1], 5), ([11, 2, 3], 7), ([10, 5, 18, 4], 19)]
+           ]
 
 -- Exercise 5 -----------------------------------------
 
+testLuhn:: (Integer, Bool) -> Bool
+testLuhn (n, d) = luhn n == d
+
 ex5Tests :: [Test]
-ex5Tests = []
+ex5Tests = [ Test "luhn test" testLuhn
+             [(5594589764218858, True), (1234567898765432, False),
+              (12345678, False), (1234567898765432112, False),
+              (55, False)]
+           ]
 
 -- Exercise 6 -----------------------------------------
 
