@@ -10,8 +10,8 @@ lastDigit n = mod n 10
 -- Drop the last digit from a number
 dropLastDigit :: Integer -> Integer
 dropLastDigit n = div n 10
- 
- 
+
+
 -- Exercise 2 -----------------------------------------
 
 toRevDigits :: Integer -> [Integer]
@@ -36,8 +36,8 @@ digits = map (read . (:[])) . show
 -- Calculate the sum of all the digits in every Integer.
 sumDigits :: [Integer] -> Integer
 sumDigits []     = 0
-sumDigits (x:xs) = if x < 10 then x + sum xs
-                 else sum ((xs) ++ (digits(x)))
+sumDigits (x:xs) = if x < 10 then x + sumDigits xs
+                 else sumDigits ((xs) ++ (digits(x)))
 
 -- Exercise 5 -----------------------------------------
 
@@ -46,8 +46,8 @@ luhn :: Integer -> Bool
 luhn n = length (toRevDigits n) == 16     -- Make sure there is the correct creditcard size
          && (sumDigits $ doubleEveryOther -- Obtain the sum of all digits, double the even ones from the right
            $ toRevDigits n)               -- The doubled ones are created from the reversed list
-           `mod` 10 == 0                  -- Modulo 10 should be 0 
-  
+           `mod` 10 == 0                  -- Modulo 10 should be 0
+
 
 -- Exercise 6 -----------------------------------------
 
