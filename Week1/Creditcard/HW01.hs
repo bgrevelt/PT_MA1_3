@@ -10,7 +10,7 @@ lastDigit n = mod n 10
 -- Drop the last digit from a number
 dropLastDigit :: Integer -> Integer
 dropLastDigit n = div n 10
- 
+
 -- Exercise 2 -----------------------------------------
 
 toRevDigits :: Integer -> [Integer]
@@ -26,10 +26,15 @@ doubleEveryOther rest = rest
 
 -- Exercise 4 -----------------------------------------
 
+--- Break down a multi number digit.
+digits :: Integer -> [Integer]
+digits = map (read . (:[])) . show
+
 -- Calculate the sum of all the digits in every Integer.
 sumDigits :: [Integer] -> Integer
-sumDigits = undefined
-
+sumDigits []     = 0
+sumDigits (x:xs) = if x < 10 then x + sum xs
+                 else sum ((xs) ++ (digits(x)))
 
 -- Exercise 5 -----------------------------------------
 
@@ -45,5 +50,3 @@ type Move = (Peg, Peg)
 
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
 hanoi = undefined
-
-
