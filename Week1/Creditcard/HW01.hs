@@ -28,14 +28,18 @@ doubleEveryOther rest = rest
 
 -- Calculate the sum of all the digits in every Integer.
 sumDigits :: [Integer] -> Integer
-sumDigits = undefined
+sumDigits = undefined                     -- sum . concatMap toRevDigits (used this for testing 5)
 
 
 -- Exercise 5 -----------------------------------------
 
 -- Validate a credit card number using the above functions.
 luhn :: Integer -> Bool
-luhn = undefined
+luhn n = length (toRevDigits n) == 16     -- Make sure there is the correct creditcard size
+         && (sumDigits $ doubleEveryOther -- Obtain the sum of all digits, double the even ones from the right
+           $ toRevDigits n)               -- The doubled ones are the reversed list
+           `mod` 10 == 0                  -- Modulo 10 should be 0 
+  
 
 -- Exercise 6 -----------------------------------------
 
