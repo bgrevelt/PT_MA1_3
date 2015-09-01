@@ -52,7 +52,7 @@ testSumDigits:: ([Integer], Integer) -> Bool
 testSumDigits (n, d) = sumDigits n == d
 
 ex4Tests :: [Test]
-ex4Tests = [ Test "testSumDigits test" testSumDigits
+ex4Tests = [ Test "sumDigits test" testSumDigits
              [  ([ 1, 2, 10, 1], 5), ([11, 2, 3], 7), ([10, 5, 18, 4], 19)]
            ]
 
