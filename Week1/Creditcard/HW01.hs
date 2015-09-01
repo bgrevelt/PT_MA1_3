@@ -31,15 +31,15 @@ doubleEveryOther rest = rest  -- If there are 0/1 left return this.
 
 --- Break down a multi number digit.
 --- For example: 123 would become [1,2,3]
-splitMultiNumberdigit :: Integer -> [Integer]
-splitMultiNumberdigit = map (read . (:[])) . show
+splitMultiNumberDigit :: Integer -> [Integer]
+splitMultiNumberDigit = map (read . (:[])) . show
 
 -- Calculate the sum of all the digits in every Integer.
 -- If some value in the list is a two-digit Integer, then break it down.
 sumDigits :: [Integer] -> Integer
 sumDigits []     = 0 -- Base case for an empty list.
 sumDigits (x:xs) = if x < 10 then x + sumDigits xs
-                 else sumDigits ((xs) ++ (splitMultiNumberdigit(x)))
+                 else sumDigits ((xs) ++ (splitMultiNumberDigit(x)))
 
 -- Exercise 5 -----------------------------------------
 
