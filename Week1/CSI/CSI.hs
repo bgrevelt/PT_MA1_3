@@ -1,6 +1,8 @@
 module CSI where
 import Data.List
-data Boy = Matthew | Peter | Jack | Arnold | Carl deriving (Eq,Show)
+import Data.Foldable
+
+data Boy = Matthew | Peter | Jack | Arnold | Carl deriving (Eq, Show)
 
 boys = [Matthew, Peter, Jack, Arnold, Carl]
 
@@ -19,49 +21,38 @@ accusers Jack = []
 accusers Carl = []
 accusers Arnold = []
 
-
-guilty, honest :: [Boy]
-guilty = []
-honest = []
-
-
-powerset = foldr (\x acc -> acc ++ map (x:) acc) [[]]
-
--- all possible solutions
-options = powerset boys
-
--- filter on three people speak the truth
-only3 = filter(\x -> length x == 3) options
+-- source: http://rosettacode.org/wiki/Power_set#Haskell
+powerset :: Foldable t => t a -> [[a]]
+powerset = Data.Foldable.foldr (\x acc -> acc ++ map (x:) acc) [[]]
 
 
-
-
-
-
-
--- Below this is my playground
-b = accusers Matthew
-c = accusers Peter
-
-
-
-
+-- Source: Alex wrote this on Thursday during the summer school Functional Programming
 genIntersect :: Eq a => [[a]] -> [a]
 genIntersect [e] = e
 genIntersect (e:l) = intersect (genIntersect l) e 
 
+-- Filters on all possible worlds so that you only have the 
+-- world left where three boys tell the truth and two are lying. 
+
+-- All possible worlds are retrieved with "powerset boys". 
+-- This returns in total 32 possibillities (2^5). 
+-- After the filter is applied there only 10 possibillities left.
+
+tenWorlds = filter(\x -> length x == 3) (powerset boys)
+
+-- Checks whether the given list boys don't "say" that another person in the groep is lying. 
+allAgree:: [Boy] -> Bool
+allAgree xs = length [x | x <- xs, y <- xs, says x y] == 9
 
 
+guilty, honest :: [Boy]
+
+-- filtering all lists out of boys where one or more boys say that some -- one else in the group doesn't "says" the truth
+honestList = filter allAgree tenWorlds
 
 
---als Peter de waarheid spreekt, dan
---spreekt Jack en Matthew niet de waarheid
+-- gets the first one in the list
+honest = head honestList
 
-hoi :: Boy -> [Boy]
-hoi b = hoi' boys b
-
-hoi'  :: [Boy] -> Boy -> [Boy]
-hoi' [] b2 = []
-hoi' (b:bs) b2 = if (elem b2 (filter (says b2) bs)) 
-                 then [b] ++ hoi' bs b2 
-                 else hoi' bs b2
+-- map makes for each honest person in the list the people he    accusses. Filter filter outs the list of the persons that don't accuse anybody. The last thing is to intersect all the sets of accussed people and shows thereby who is guilty
+guilty = genIntersect (filter (not . null) (map (accusers) honest))
