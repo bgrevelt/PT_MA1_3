@@ -70,8 +70,16 @@ ex5Tests = [ Test "luhn test" testLuhn
 
 -- Exercise 6 -----------------------------------------
 
+--testHanoi:: (Integer, Peg, Peg, Peg, Move) -> Bool
+--testHanoi (n, n1, n2, n3, d) = hanoi n n1 n2 n3 == d
+
 ex6Tests :: [Test]
 ex6Tests = []
+--         [ Test "hanoi test" testHanoi
+--           [(2, "a", "b", "c", True), (1, "a", "b", "c", True),
+--            (0, "a", "b", "c", True), (10, "a", "b", "c", False)
+--           ]
+--         ]
 
 -- All Tests ------------------------------------------
 
