@@ -22,6 +22,8 @@ accusers Jack = []
 accusers Carl = []
 accusers Arnold = []
 
+-- Suggestion: instead of creating a powerset/filter that we could just take the N = X subsets 
+-- Suggestion: http://goo.gl/XQUwGO
 -- source: http://rosettacode.org/wiki/Power_set#Haskell
 powerset :: Foldable t => t a -> [[a]]
 powerset = Data.Foldable.foldr (\x acc -> acc ++ map (x:) acc) [[]]
