@@ -8,11 +8,12 @@ boys = [Matthew, Peter, Jack, Arnold, Carl]
 
 
 says :: Boy -> Boy -> Bool
-says p1 p2 | p1==Jack && p2 == Matthew = False
-           | p1==Jack && p2 == Peter = False
-           | p1==Carl && p2 == Arnold = False
-           | p1==Arnold && (p2 == Peter || p2 == Matthew) = False
-           | otherwise = True
+says Jack Matthew = False
+says Jack Peter = False
+says Carl Arnold = False
+says Arnold Peter = False
+says Arnold Matthew = False
+says _ _ = True
  
 accusers :: Boy -> [Boy]
 accusers Peter = [Matthew, Jack]
@@ -21,6 +22,8 @@ accusers Jack = []
 accusers Carl = []
 accusers Arnold = []
 
+-- Suggestion: instead of creating a powerset/filter that we could just take the N = X subsets 
+-- Suggestion: http://goo.gl/XQUwGO
 -- source: http://rosettacode.org/wiki/Power_set#Haskell
 powerset :: Foldable t => t a -> [[a]]
 powerset = Data.Foldable.foldr (\x acc -> acc ++ map (x:) acc) [[]]
