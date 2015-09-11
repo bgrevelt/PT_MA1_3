@@ -55,16 +55,41 @@ testR k n f r = if k == n then print (show n ++ " tests passed")
                   else error ("failed test on: " ++ show xs)
                   
 
+prop_ordered :: Ord a => [a] -> Bool
+prop_ordered [] = True
+prop_ordered (x:xs) = all (>= x) xs && prop_ordered xs
+
+
+quicksort :: Ord a => [a] -> [a]  
+quicksort [] = []  
+quicksort (x:xs) = 
+   quicksort [ a | a <- xs, a <= x ]  
+   ++ [x]
+   ++ quicksort [ a | a <- xs, a > x ]                  
+
 testPost :: ([Int] -> [Int]) -> ([Int] -> Bool) -> IO ()
 testPost f p = testR 1 100 f (\_ -> p)
 
 
+testR2 :: Int -> Int -> ([Int] -> Shape)
+                     -> ([Int] -> Shape -> Bool) -> IO ()
+testR2 k n f r = if k == n then print (show n ++ " tests passed")
+                else do
+                  xs <- genIntList
+                  if r xs (f xs) then
+                    do print ("pass on: " ++ show xs)
+                       testR2 (k+1) n f r
+                  else error ("failed test on: " ++ show xs)
+
+testPost2 :: ([Int] -> Shape) -> (Shape -> Bool) -> IO ()
+testPost2 f p = testR2 1 100 f (\_ -> p)
+
+prop_other :: Shape -> Bool
+prop_other shape | shape == NoTriangle = True
+                 | otherwise = False
 
 
-prop_other :: Int -> Int -> Int -> Bool
-prop_other a b c = a + b + c == 20
-
-
+test =  testPost2 triangleMap prop_other
 
 
 
