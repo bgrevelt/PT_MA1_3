@@ -21,26 +21,22 @@ accusers Jack = []
 accusers Carl = []
 accusers Arnold = []
 
--- source: http://rosettacode.org/wiki/Power_set#Haskell
-powerset :: Foldable t => t a -> [[a]]
-powerset = Data.Foldable.foldr (\x acc -> acc ++ map (x:) acc) [[]]
-
+subsets :: Int -> [a] -> [[a]]
+subsets 0 _ = [[]]
+subsets _ [] = []
+subsets k (x:xs) = map (x:) (subsets (k - 1) xs) ++ subsets k xs
 
 -- Source: Alex wrote this on Thursday during the summer school Functional Programming
 genIntersect :: Eq a => [[a]] -> [a]
 genIntersect [e] = e
 genIntersect (e:l) = intersect (genIntersect l) e 
 
--- Filters on all possible worlds so that you only have the 
--- world left where three boys tell the truth and two are lying. 
+-- Get all possible worlds where three boys tell the truth and two are lying. In this case there are only 10 possibillities.
 
--- All possible worlds are retrieved with "powerset boys". 
--- This returns in total 32 possibillities (2^5). 
--- After the filter is applied there only 10 possibillities left.
+tenWorlds = subsets 3 boys
 
-tenWorlds = filter(\x -> length x == 3) (powerset boys)
+-- Checks whether the given list boys don't "say" that another person in the group is lying. 
 
--- Checks whether the given list boys don't "say" that another person in the groep is lying. 
 allAgree:: [Boy] -> Bool
 allAgree xs = length [x | x <- xs, y <- xs, says x y] == 9
 
