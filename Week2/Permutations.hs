@@ -4,6 +4,21 @@ module Permutations where
 import Data.List
 import TestFunctions
 
+{-
+  === Concise test report ===
+  This is about as concise as I can be, so here it comes.
+    - I've spent around 6 to 8 hours on this code.
+    - I did not include reading and watching videos about the subject..
+    - The most problematic part for me was understanding what exactly should
+    be automatically tested. According to Hoare Logic - or at least how I interpreted
+    it - a program is true when the precondition is met for some random input.
+    Then when the function and the postcondition are met, the program is valid according
+    to Hoare Logic. So there is a question left for me:
+      - Should a function be (automatically) tested according to all possible preconditions?
+      - That doesn't say anything about the correctness of the implementation of the function, so that is
+      a bit of a dilemma for me... Or isn't that the goal of Hoar Logic?
+-}
+
 isPermutation :: Eq a => [a] -> [a] -> Bool
 isPermutation [] [] = True
 isPermutation xs (y:ys) | length xs /= length (y:ys) = False
