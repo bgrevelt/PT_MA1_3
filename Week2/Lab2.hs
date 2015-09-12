@@ -21,6 +21,14 @@ triangle a b c | a + b <= c || a + c <= b || b + c <= a = NoTriangle -- geen dri
                | otherwise = Other -- Anders (wel een driehoek)
                
 
+isPermutation :: Eq a => [a] -> [a] -> Bool
+isPermutation [] [] = True --- Empty lists are always the same
+isPermutation [] (y:ys) = False
+isPermutation (x:xs) ys | length (x:xs) /= length ys = False
+                        | otherwise = elem x ys && isPermutation xs (delete x ys)
+
+
+
 
 getRandomInt :: Int -> IO Int
 getRandomInt n = getStdRandom (randomR (0,n))
