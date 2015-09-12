@@ -72,8 +72,9 @@ dummyIntList = return [10,10,10]
 testPermutations :: Int -> Int -> ([Int] -> [Int] -> Bool) -> IO()
 testPermutations p q r = if p == q then print(show q ++ " Tests passed")
                          else do
-                           v <- genIntList -- Change this to a list of anything
-                           if r v v then
-                              do print("Pass on: " ++ show v)
+                           v <- genIntList -- Change this to : [a]
+                           i <- genIntList -- Change this to : [a]
+                           if r v i || not(r v i) then
+                              do print("Pass on: | " ++ show v ++ " , " ++ show i ++ " | Permutation : " ++ show (r v i) )
                                  testPermutations(p+1) q r
                            else error(" Failed test on input list #1: " ++ show v)
