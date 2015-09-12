@@ -30,9 +30,6 @@ isPermutation _ _ = False
 test :: Int -> IO()
 test n =  testPermutations 1 n isPermutation
 
-dummyIntList :: IO [Int]
-dummyIntList = return [10,10,10]
-
 --- Argument #1 : Starting for number of testcases
 --- Argument #2 : End for number of testcases
 --- Argument #3 : Function to be tested
