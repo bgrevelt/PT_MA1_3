@@ -2,7 +2,7 @@
 module Permutations where
 
 import Data.List
-import System.Random
+import TestFunctions
 
 isPermutation :: Eq a => [a] -> [a] -> Bool
 isPermutation [] [] = True
@@ -26,39 +26,6 @@ isPermutation _ _ = False
 
 -}
 
-{-
-  | # Generate methods
-  |=====================================================================
-  |  The following section is for generating random test data.
--}
-
-getRandomInt :: Int -> IO Int
-getRandomInt n = getStdRandom (randomR (0,n))
-
-genIntList :: IO [Int]
-genIntList = do
-  k <- getRandomInt 20
-  n <- getRandomInt 10
-  getIntL k n
-
-getIntL :: Int -> Int -> IO [Int]
-getIntL _ 0 = return []
-getIntL k n = do
-   x <-  getRandomInt k
-   y <- randomFlip x
-   xs <- getIntL k (n-1)
-   return (y:xs)
-
-randomFlip :: Int -> IO Int
-randomFlip x = do
-   b <- getRandomInt 1
-   if b==0 then return x else return (-x)
-
-{-
- | # End generate methods
- |=====================================================================
--}
-
 --- Argument #1 : Number of tests to be generated
 test :: Int -> IO()
 test n =  testPermutations 1 n isPermutation
@@ -75,6 +42,6 @@ testPermutations p q r = if p == q then print(show q ++ " Tests passed")
                            v <- genIntList -- Change this to : [a]
                            i <- genIntList -- Change this to : [a]
                            if r v i || not(r v i) then
-                              do print("Pass on: | " ++ show v ++ " , " ++ show i ++ " | Permutation : " ++ show (r v i) )
+                              do print("Pass on: | " ++ show (r v i) ++ " | " ++ show v ++ " , " ++ show i ++ " |")
                                  testPermutations(p+1) q r
                            else error(" Failed test on input list #1: " ++ show v)
