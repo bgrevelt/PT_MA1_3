@@ -1,6 +1,13 @@
 {-# OPTIONS_GHC -Wall #-}
 module TestIban 
 where
+
+{ -- Test report
+By calling test with the number of tests to be run as the argument x tests on the iban algorithm will be executed.
+Each test will randomly be of a valid or invalid iban. If an invalid iban is used, the type of invalidation 
+(invalidation of checksum, bban or country code) will also be determined at random. 
+Time spent: Approx. 10 Hrs (the majority of time spent was spent on getting stuff to compile with IO)
+--} 
   
 import IBAN
 import TestFunctions
