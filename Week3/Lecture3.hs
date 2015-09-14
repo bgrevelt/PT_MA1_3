@@ -154,7 +154,7 @@ propNames = sort.nub.pnames where
 type Valuation = [(Name,Bool)]
 
 -- | all possible valuations for lists of prop letters
-> genVals :: [Name] -> [Valuation]
+genVals :: [Name] -> [Valuation]
 genVals [] = [[]]
 genVals (name:names) = 
   map ((name,True) :) (genVals names)
