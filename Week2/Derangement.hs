@@ -28,8 +28,8 @@ deran n = filter (\ p -> 				-- Take only the derangements
   		(perms n)				-- Get all the permutations
 
 isDerangement :: Eq a => [a] -> [a] -> Bool		-- No need to check for [] [] because perms should do that and zipWith will fail anyway
-isDerangement x y = and(zipWith (/=) x y)		-- Check if indexes are equal
-		&& isPermutation x y			-- Has to be a permutation
+isDerangement x y = and((zipWith (/=) x y)		-- Check if indexes are equal
+		++ isPermutation x y)			-- Has to be a permutation
 
 --
 -- define some testable properties for the isDerangement function
