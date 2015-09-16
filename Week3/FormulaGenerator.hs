@@ -10,11 +10,11 @@ import Test.QuickCheck
 import Lecture3
 import Conversion
 
-isCnfTautology :: ( Form -> Form ) -> Bool
-isCnfTautology _ = True
+isTautology :: Form -> Form -> Bool
+isTautology _ _ = True
 
-isConjunctionOfDisjunctions :: ( Form -> Form ) -> Bool
-isConjunctionOfDisjunctions _ = True
+isConjunctionOfDisjunctions :: Form -> Form -> Bool
+isConjunctionOfDisjunctions _ _ = True
 
-disjunctionsAreSeparatedByLiterals :: ( Form -> Form ) -> Bool
-disjunctionsAreSeparatedByLiterals _ = True
+isDisjunctionOfLiterals :: Form -> Form -> Bool
+isDisjunctionOfLiterals _ _ = True
