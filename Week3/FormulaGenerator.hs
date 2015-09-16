@@ -18,3 +18,7 @@ isConjunctionOfDisjunctions _ _ = True
 
 isDisjunctionOfLiterals :: Form -> Form -> Bool
 isDisjunctionOfLiterals _ _ = True
+
+-- isArrowFree :: Form -> Form -> Bool
+-- isArrowFree i o =
+-- isArrowFree _ _ = True

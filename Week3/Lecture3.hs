@@ -5,6 +5,7 @@ where
 import Test.QuickCheck
 import Data.List
 import Data.Char
+import Control.Monad
 
 infixl 2 #
 
@@ -121,17 +122,17 @@ data Form = Prop Name
           deriving Eq
 
 instance Arbitrary Form where
-  arbitrary = do
-    prop <- arbitrary
-    return (Prop prop)
+  arbitrary = oneof [Prop <$> arbitrary, Neg <$> arbitrary, Cnj <$> arbitrary, Dsj <$> arbitrary, Impl <$> arbitrary <*> arbitrary, Equiv <$> arbitrary <*> arbitrary]
 
 instance Show Form where
-  show (Prop x)       = show x
-  show (Neg f)        = '¬' : show f
-  show (Cnj fs)       = "∧(" ++ showLst fs ++ ")"
-  show (Dsj fs)       = "∨(" ++ showLst fs ++ ")"
-  show (Impl f1 f2)   = "(" ++ show f1 ++ " --> " ++ show f2 ++ ")"
-  show (Equiv f1 f2)  = "(" ++ show f1 ++ " <--> "++ show f2 ++ ")"
+  show (Prop x)   = show x
+  show (Neg f)    = '-' : show f
+  show (Cnj fs)     = "*(" ++ showLst fs ++ ")"
+  show (Dsj fs)     = "+(" ++ showLst fs ++ ")"
+  show (Impl f1 f2)  = "(" ++ show f1 ++ "==>"
+                           ++ show f2 ++ ")"
+  show (Equiv f1 f2)  = "(" ++ show f1 ++ "<=>"
+                           ++ show f2 ++ ")"
 
 showLst,showRest :: [Form] -> String
 showLst [] = ""
