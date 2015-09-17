@@ -122,7 +122,20 @@ data Form = Prop Name
           deriving Eq
 
 instance Arbitrary Form where
-  arbitrary = oneof [Prop <$> arbitrary, Neg <$> arbitrary, Cnj <$> arbitrary, Dsj <$> arbitrary, Impl <$> arbitrary <*> arbitrary, Equiv <$> arbitrary <*> arbitrary]
+  arbitrary = sized $ \n ->
+    oneof $
+      [ Prop <$> arbitrary ]
+      ++ if n == 0
+         then [] -- No recursion at size 0
+         else resize (n - 1) <$>
+           [ Neg <$> arbitrary
+           , Cnj <$> arbitrary
+           , Dsj <$> arbitrary
+           , Impl <$> arbitrary <*> arbitrary
+           , Equiv <$> arbitrary <*> arbitrary ]
+
+--  jack_ : you use `sized' to get access to the current (implicit) size, like `sized $ \n -> do ..n..' e.g.
+--  jack_ : use `resize' to (locally) change the current size, like `resize n $ do ...'. the changed size is only in effect in the `do ...'
 
 instance Show Form where
   show (Prop x)   = show x
