@@ -134,9 +134,6 @@ instance Arbitrary Form where
            , Impl <$> arbitrary <*> arbitrary
            , Equiv <$> arbitrary <*> arbitrary ]
 
---  jack_ : you use `sized' to get access to the current (implicit) size, like `sized $ \n -> do ..n..' e.g.
---  jack_ : use `resize' to (locally) change the current size, like `resize n $ do ...'. the changed size is only in effect in the `do ...'
-
 instance Show Form where
   show (Prop x)   = show x
   show (Neg f)    = '-' : show f

@@ -10,15 +10,17 @@ import Test.QuickCheck
 import Lecture3
 import Conversion
 
-isTautology :: Form -> Form -> Bool
-isTautology _ _ = True
+prop_isTautology :: Form -> Form -> Bool
+prop_isTautology _ _ = True
 
-isConjunctionOfDisjunctions :: Form -> Form -> Bool
-isConjunctionOfDisjunctions _ _ = True
+prop_isConjunctionOfDisjunctions :: Form -> Form -> Bool
+prop_isConjunctionOfDisjunctions _ _ = True
 
-isDisjunctionOfLiterals :: Form -> Form -> Bool
-isDisjunctionOfLiterals _ _ = True
+prop_isDisjunctionOfLiterals :: Form -> Form -> Bool
+prop_isDisjunctionOfLiterals _ _ = True
 
--- isArrowFree :: Form -> Bool
--- isArrowFree x = convertForm x
--- isArrowFree _ = True
+
+--- Sample usage with output and a maxdepth of 5 for the formula's
+--- verboseCheckWith (stdArgs{maxSize=5}) isTautology
+--- verboseCheckWith (stdArgs{maxSize=5}) isConjuctionOfLiterals
+--- verboseCheckWith (stdArgs{maxSize=5}) isDisjunctionOfLiterals
