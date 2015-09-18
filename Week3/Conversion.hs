@@ -33,7 +33,7 @@ reorder (Cnj (n : xs)) x =                                      -- For the form 
   Cnj [reorder n x, reorder (Cnj xs) x]		
 reorder n (Cnj (x : xs)) =                                      -- Same also recheck the form Cnj 
   Cnj [reorder n x, reorder n (Cnj xs)]                         -- Create a conjuction of the set Form n x, Form n xs
-reorder n x              = Dsj [n,x]                            -- If both are disjunctions this is good since this is allowed
+reorder n x              = Dsj [n, x]                           -- If both are disjunctions this is good since this is allowed
 
 
 --
