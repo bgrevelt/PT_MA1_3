@@ -10,14 +10,11 @@ Test report:
 
 
 Outcome of the tests by executing "testParse xs compareForm": 
-  7 of the 15 tests failed. I think the most of the test fall because the specifications are unclear. What should return the expression '-1'. I assume '-1' and not '[-1]'. Or the specifications are wrong or the code. Below are all results of the tests. 
+  9 of the 15 tests failed. I think the most of the test fall because the specifications are unclear. What should return the expression '-1'. I assume '-1' and not '[-1]'. Or the specifications are wrong or the code. Below are all results of the tests. 
   
 
-testParse xs compareForm
-"Test passed on: '\"*(1 +(2 -3))\"'"
-"Test passed on: '\"*(1 +(2 -3)\"'"
-"Test passed on: '\"*(1            +(2-3))\"'"
-"Test failed when parsing: '1'. Expected result: '1', but got: '[1]' "
+testParse xs compareForm"
+Test failed when parsing: '1'. Expected result: '1', but got: '[1]' "
 "Test failed when parsing: '-2'. Expected result: '-2', but got: '[-2]' "
 "Test passed on: '\"\"'"
 "Test failed when parsing: '*'. Expected result: '', but got: '[]' "
@@ -25,18 +22,20 @@ testParse xs compareForm
 "Test failed when parsing: '==>'. Expected result: '', but got: '[]' "
 "Test failed when parsing: '1==>3'. Expected result: '1==>3', but got: '[1]' "
 "Test passed on: '\"(1==>3)\"'"
-"Test failed when parsing: '1<==>3'. Expected result: '1<==>3', but got: '[1]' "
+"Test failed when parsing: '1<=>3'. Expected result: '1<=>3', but got: '[1]' "
+"Test passed on: '\"(1<=>3)\"'"
+"Test passed on: '\"*(1 +(2 -3))\"'"
+"Test passed on: '\"*(1 +(2 -3)\"'"
+"Test passed on: '\" *  (  1 + ( 2 - 3 ) )\"'"
+"Test failed when parsing: '*(2 -3)<==>-(9 3)'. Expected result: '*(2 -3)<==>-(9 3)', but got: '[*(2 -3)]' "
+"Test failed when parsing: '*(2 -3)==>-(9 3)'. Expected result: '*(2 -3)==>-(9 3)', but got: '[*(2 -3)]' "
+
 
   Time spent: approximately 6 hours
 -}
 
 
 xs = [
-      -- testing combination of negation, disjunction and conjunction
-      ("*(1 +(2 -3))",            "[*(1 +(2 -3))]"), 
-      -- testing invalid Form, missing one bracket ')'  at the end
-      ("*(1 +(2 -3)",             "[]"), 
-      ("*(1            +(2-3))",  "[*(1 +(2 -3))]"), 
       -- testing single value
       ("1",                       "1"), 
       -- testing negation
@@ -54,9 +53,15 @@ xs = [
             -- testing implication with parenthesis
       ("(1==>3)",                 "[(1==>3)]"), 
       -- testing  equivalence without parenthesis
-      ("1<==>3",                  "1<==>3"), 
+      ("1<=>3",                  "1<=>3"), 
       -- testing  equivalence with parenthesis
-      ("(1<==>3)",                "[(1<==>3)]"), 
+      ("(1<=>3)",                "[(1<=>3)]"), 
+      -- testing combination of negation, disjunction and conjunction
+      ("*(1 +(2 -3))",            "[*(1 +(2 -3))]"), 
+      -- testing invalid Form, missing one bracket ')'  at the end
+      ("*(1 +(2 -3)",             "[]"), 
+      -- testing whitespaces
+      (" *  (  1 + ( 2 - 3 ) )",  "[*(1 +(2 -3))]"), 
       -- testing combination of negation, disjunction, conjunction and equivalence
       ("*(2 -3)<==>-(9 3)",       "*(2 -3)<==>-(9 3)"),
       -- testing combination of negation, disjunction, conjunction and implication
