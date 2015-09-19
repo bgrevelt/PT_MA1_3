@@ -10,21 +10,24 @@ Test report:
 
 
 Outcome of the tests by executing "testParse xs compareForm": 
-  6 of the 10 tests failed. I think the most of the test fall because the specifications are unclear. What should return the expression '-1'. I assume '-1' and not '[-1]'. Or the specifications are wrong or the code. Below are all results of the tests. 
+  7 of the 15 tests failed. I think the most of the test fall because the specifications are unclear. What should return the expression '-1'. I assume '-1' and not '[-1]'. Or the specifications are wrong or the code. Below are all results of the tests. 
   
 
-  Test passed on: '\*(1 +(2 -3))\'
-  Test passed on: '\*(1 +(2 -3)\'
-  Test passed on: '\*(1            +(2-3))\'
-  Test failed when parsing: '1'. Expected result: '1', but got: '[1]'
-  Test failed when parsing: '-2'. Expected result: '-2', but got: '[-2]'
-  Test passed on: '\\'
-  Test failed when parsing: '+'. Expected result: '', but got: '[]' 
-  Test failed when parsing: '==>'. Expected result: '', but got: '[]' 
-  Test failed when parsing: '1==>3'. Expected result: '1==>3', but got: '[1]' 
-  Test failed when parsing: '1<==>3'. Expected result: '1<==>3', but got: '[1]' 
+testParse xs compareForm
+"Test passed on: '\"*(1 +(2 -3))\"'"
+"Test passed on: '\"*(1 +(2 -3)\"'"
+"Test passed on: '\"*(1            +(2-3))\"'"
+"Test failed when parsing: '1'. Expected result: '1', but got: '[1]' "
+"Test failed when parsing: '-2'. Expected result: '-2', but got: '[-2]' "
+"Test passed on: '\"\"'"
+"Test failed when parsing: '*'. Expected result: '', but got: '[]' "
+"Test failed when parsing: '+'. Expected result: '', but got: '[]' "
+"Test failed when parsing: '==>'. Expected result: '', but got: '[]' "
+"Test failed when parsing: '1==>3'. Expected result: '1==>3', but got: '[1]' "
+"Test passed on: '\"(1==>3)\"'"
+"Test failed when parsing: '1<==>3'. Expected result: '1<==>3', but got: '[1]' "
 
-  Time spent: approximately 5 hours
+  Time spent: approximately 6 hours
 -}
 
 
