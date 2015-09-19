@@ -6,10 +6,10 @@ import Lecture3
 
 {-
 Test report:
-  Test method: using predefined in- and output and test if the expected output matches with the output from the parse method.
+  Test method: using predefined in- and output and test if the expected output matches with the output from the parse method. Reason for predefined testing is that with automated generation of test cases it's very difficult to know if you test all the different scenarios. Another reason for not automatically testing is that swapping some parts of an valid expressions to make them invalid may accidentally lead to valid cases. In such a scenario your test doesn't give back the correct result.
 
 
-  Outcome of the tests by executing "testParse xs compareForm": 
+Outcome of the tests by executing "testParse xs compareForm": 
   6 of the 10 tests failed. I think the most of the test fall because the specifications are unclear. What should return the expression '-1'. I assume '-1' and not '[-1]'. Or the specifications are wrong or the code. Below are all results of the tests. 
   
 
@@ -29,16 +29,35 @@ Test report:
 
 
 xs = [
-      ("*(1 +(2 -3))",            "[*(1 +(2 -3))]"),
-      ("*(1 +(2 -3)",             "[]"),
-      ("*(1            +(2-3))",  "[*(1 +(2 -3))]"),
-      ("1",                       "1"),
-      ("-2",                      "-2"),
-      ("",                        "[]"),
-      ("+",                       ""),
-      ("==>",                     ""),
-      ("1==>3",                   "1==>3"),
-      ("1<==>3",                   "1<==>3")
+      -- testing combination of negation, disjunction and conjunction
+      ("*(1 +(2 -3))",            "[*(1 +(2 -3))]"), 
+      -- testing invalid Form, missing one bracket ')'  at the end
+      ("*(1 +(2 -3)",             "[]"), 
+      ("*(1            +(2-3))",  "[*(1 +(2 -3))]"), 
+      -- testing single value
+      ("1",                       "1"), 
+      -- testing negation
+      ("-2",                      "-2"), 
+      -- testing empty form
+      ("",                        "[]"), 
+      -- testing conjunction without values
+      ("*",                       ""), 
+      -- testing disjunction without values
+      ("+",                       ""), 
+      -- testing implication without values
+      ("==>",                     ""), 
+      -- testing implication without parenthesis
+      ("1==>3",                   "1==>3"), 
+            -- testing implication with parenthesis
+      ("(1==>3)",                 "[(1==>3)]"), 
+      -- testing  equivalence without parenthesis
+      ("1<==>3",                  "1<==>3"), 
+      -- testing  equivalence with parenthesis
+      ("(1<==>3)",                "[(1<==>3)]"), 
+      -- testing combination of negation, disjunction, conjunction and equivalence
+      ("*(2 -3)<==>-(9 3)",       "*(2 -3)<==>-(9 3)"),
+      -- testing combination of negation, disjunction, conjunction and implication
+      ("*(2 -3)==>-(9 3)",       "*(2 -3)==>-(9 3)")
       ]
 
 compareForm :: String -> String -> Bool
@@ -63,3 +82,4 @@ numberOfTests = length xs
 numberOfTestsPassed = length ys
 
 allTestsPass = numberOfTests == numberOfTestsPassed
+
