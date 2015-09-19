@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-module Euler1 where
+module Euler9 where
 
 solution::Integer -> [Integer]
 solution n = [
