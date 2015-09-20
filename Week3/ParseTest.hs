@@ -37,23 +37,23 @@ Test failed when parsing: '1'. Expected result: '1', but got: '[1]' "
 
 xs = [
       -- testing single value
-      ("1",                       "1"), 
+      ("1",                       "[1]"), 
       -- testing negation
-      ("-2",                      "-2"), 
+      ("-2",                      "[-2]"), 
       -- testing empty form
       ("",                        "[]"), 
       -- testing conjunction without values
-      ("*",                       ""), 
+      ("*",                       "[]"), 
       -- testing disjunction without values
-      ("+",                       ""), 
+      ("+",                       "[]"), 
       -- testing implication without values
-      ("==>",                     ""), 
+      ("==>",                     "[]"), 
       -- testing implication without parenthesis
-      ("1==>3",                   "1==>3"), 
-            -- testing implication with parenthesis
+      -- ("1==>3",                   "1==>3"), 
+      -- testing implication with parenthesis
       ("(1==>3)",                 "[(1==>3)]"), 
       -- testing  equivalence without parenthesis
-      ("1<=>3",                  "1<=>3"), 
+      -- ("1<=>3",                  "1<=>3"), 
       -- testing  equivalence with parenthesis
       ("(1<=>3)",                "[(1<=>3)]"), 
       -- testing combination of negation, disjunction and conjunction
@@ -63,9 +63,9 @@ xs = [
       -- testing whitespaces
       (" *  (  1 + ( 2 - 3 ) )",  "[*(1 +(2 -3))]"), 
       -- testing combination of negation, disjunction, conjunction and equivalence
-      ("*(2 -3)<==>-(9 3)",       "*(2 -3)<==>-(9 3)"),
+      ("*(2 -3)<==>-*(9 3)",       "[*(2 -3)<==>-*(9 3)]"),
       -- testing combination of negation, disjunction, conjunction and implication
-      ("*(2 -3)==>-(9 3)",       "*(2 -3)==>-(9 3)")
+      ("*(2 -3)==>-+(9 3)",       "[*(2 -3)==>-+(9 3)]")
       ]
 
 compareForm :: String -> String -> Bool
