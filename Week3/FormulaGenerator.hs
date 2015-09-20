@@ -102,7 +102,8 @@ isDisjunctionOfLiterals f = isDisjunctionOfLiterals' $ lexer $ show $ convertFor
 
 isDisjunctionOfLiterals' :: [Token] -> Bool
 isDisjunctionOfLiterals' []     = True
-isDisjunctionOfLiterals' (x:xs) = case x of
+isDisjunctionOfLiterals' (x:xs) = if xs == [] then True else
+                                    case x of
                                       TokenDsj  {} ->  case head xs of
                                           TokenOP  {} -> isDisjunctionOfLiterals' xs
                                           _ -> False
