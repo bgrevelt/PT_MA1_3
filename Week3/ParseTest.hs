@@ -3,38 +3,12 @@ where
 import Lecture3
 
 
-
 {-
 Test report:
-  Test method: using predefined in- and output and test if the expected output matches with the output from the parse method. Reason for predefined testing is that with automated generation of test cases it's very difficult to know if you test all the different scenarios. Another reason for not automatically testing is that swapping some parts of an valid expressions to make them invalid may accidentally lead to valid cases. In such a scenario your test doesn't give back the correct result.
-
-
-Outcome of the tests by executing "testParse xs compareForm":
-  9 of the 15 tests failed. I think the most of the test fall because the specifications are unclear. What should return the expression '-1'. I assume '-1' and not '[-1]'. Or the specifications are wrong or the code. Below are all results of the tests.
-
-
-testParse xs compareForm"
-Test failed when parsing: '1'. Expected result: '1', but got: '[1]' "
-"Test failed when parsing: '-2'. Expected result: '-2', but got: '[-2]' "
-"Test passed on: '\"\"'"
-"Test failed when parsing: '*'. Expected result: '', but got: '[]' "
-"Test failed when parsing: '+'. Expected result: '', but got: '[]' "
-"Test failed when parsing: '==>'. Expected result: '', but got: '[]' "
-"Test failed when parsing: '1==>3'. Expected result: '1==>3', but got: '[1]' "
-"Test passed on: '\"(1==>3)\"'"
-"Test failed when parsing: '1<=>3'. Expected result: '1<=>3', but got: '[1]' "
-"Test passed on: '\"(1<=>3)\"'"
-"Test passed on: '\"*(1 +(2 -3))\"'"
-"Test passed on: '\"*(1 +(2 -3)\"'"
-"Test passed on: '\" *  (  1 + ( 2 - 3 ) )\"'"
-"Test failed when parsing: '*(2 -3)<==>-(9 3)'. Expected result: '*(2 -3)<==>-(9 3)', but got: '[*(2 -3)]' "
-"Test failed when parsing: '*(2 -3)==>-(9 3)'. Expected result: '*(2 -3)==>-(9 3)', but got: '[*(2 -3)]' "
-
-
-  Time spent: approximately 6 hours
--}
-
-{-
+  Test method: using predefined in- and output and test if the expected output matches with the output from the parse method. 
+  Reason for predefined testing is that with automated generation of test cases it's very difficult to know if you test all 
+  the different scenarios. Another reason for not using automated testing is that swapping some parts of valid expressions 
+  to make them invalid may accidentally lead to valid cases. In such a scenario your test doesn't give back the correct result.
 
 "Test passed on: '\"1\"'"
 "Test passed on: '\"-2\"'"
@@ -55,6 +29,7 @@ After the meeting on sunday the 20th, we concluded that the expected results wer
 from what the method specification said it would. Therefore we changed the expected results
 to include brackets, because that is what the method's output is.
 
+Time spent: approximately 6 hours
 -}
 
 
