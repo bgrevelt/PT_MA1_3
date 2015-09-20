@@ -41,7 +41,16 @@ equivalences = [
    -- p || (q && r) <=> (p || q) && (p || r)
   ((Dsj [p, Cnj [q,r]]), (Cnj [(Dsj [p,q]),(Dsj [p,r])])),
     -- (p -> q) -> (-q -> -p)
-  ((Impl p q), (Impl (Neg q) (Neg p)))
+  ((Impl p q), (Impl (Neg q) (Neg p))),
+  -- The following is directly copied from "The haskell road to logic, maths and programming", page 46
+  ((Cnj [p, p]), p), ((Dsj [p, p]), p),
+  ((Impl p q), (Dsj [(Neg p), q])),
+  ((Equiv p q), (Cnj [(Impl p q), (Impl q p)])),
+  ((Dsj [p,q]), (Dsj [q,p])), ((Cnj [p,q]), (Cnj [q,p])),
+  ((Neg (Cnj [p, q])), (Dsj [(Neg p), (Neg q)])), ((Neg (Dsj [p, q])), (Cnj [(Neg p), (Neg q)])),
+  ((Cnj [p, (Cnj [q, r])]), (Cnj [(Cnj [p,q]), r])), 
+  ((Dsj [p, (Dsj [q, r])]), (Dsj [(Dsj [p,q]), r])),
+  ((Cnj [p, (Dsj [q, r])]), (Dsj [(Cnj [p, q]), (Cnj [p, r])]))
   ]
   
 entailments :: [(Form,Form)]
@@ -119,21 +128,21 @@ testForm [] _ _ = do print ("Done")
 testForm (frm: fs) f e = 
   if (f frm == e) 
     then do 
-      print ("Test passed on" ++ show frm)
+      print ("Test passed on: " ++ show frm)
       testForm fs f e
     else error ("failed test on: " ++ show frm)
 
 -- One takes pairs of formulas, a classification function for  two 
--- formulas and an expected outcome of applyin the function to the two 
+-- formulas and an expected outcome of applyin the function to the two
 -- formulas
 testFormRel :: [(Form,Form)] -> (Form -> Form -> Bool) -> Bool -> IO ()
 testFormRel [] _ _ = do print ("Done")
 testFormRel ((frm1,frm2): frmPairs) f e = 
   if (f frm1 frm2 == e) 
     then do 
-      print ("Test passed on" ++ show frm1 ++ show frm2)
+      print ("Test passed on: " ++ show frm1 ++ " and " ++ show frm2)
       testFormRel frmPairs f e
-    else error ("failed test on: " ++ show frm1 ++ show frm2)
+    else error ("failed test on: " ++ show frm1 ++ " and " ++ show frm2)
 
 
 -- Finally, a small helper function to wrap all the tests in    
