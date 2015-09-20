@@ -69,7 +69,7 @@ instance Arbitrary Form where
  arbitrary = sized form'
    where
      form' 0 = liftM Prop arbitrarySizedIntegral
-     form' n | n>0 = oneof [liftM Prop arbitrarySizedIntegral, liftM Neg form'', liftM2 Impl form'' form'', liftM2 Equiv form'' form'', liftM Cnj (replicateM n form''), liftM Dsj (replicateM n form'') ]
+     form' n | n>0 = oneof [liftM Prop arbitrarySizedIntegral, liftM Neg form'', liftM2 Impl form'' form'', liftM2 Equiv form'' form'', liftM Cnj (replicateM (min 2n) form''), liftM Dsj (replicateM (min 2 n) form'') ]
       where form'' = form' (n `div` 2)
 
 isConjunctionOfDisjunctions :: Form -> Bool
