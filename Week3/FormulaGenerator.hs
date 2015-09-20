@@ -41,6 +41,25 @@ import FormClassification
     *(+(-1 2 1) +(-1 2 -2) +(-1 2 -2) +(-1 2 1) +(2 -1 1) +(2 -1 -2) +(2 -1 -2) +(2 -1 1))
 
   The properties to test with are testing on the input variant instead of the output.
+  Anyway, the generated form could be in a rare form like this:
+  *(+(-2) (-2==>2)) Which is not even valid..
+
+  If you are doing one the following the tests pass:
+  isConjunctionOfDisjunctions (convertForm formula1)
+  True
+  isConjunctionOfDisjunctions (convertForm formula2)
+  True
+  isConjunctionOfDisjunctions (convertForm formula3)
+  True
+
+  isDisjunctionOfLiterals (convertForm formula1)
+  True
+  isDisjunctionOfLiterals (convertForm formula2)
+  True
+  isDisjunctionOfLiterals (convertForm formula3)
+  True
+
+  These formulas are known to be correct..
 
   Time spent: 12 hours
 
@@ -58,23 +77,24 @@ isConjunctionOfDisjunctions f = isConjunctionOfDisjunctions' $ lexer $ show $ co
 
 isConjunctionOfDisjunctions' :: [Token] -> Bool
 isConjunctionOfDisjunctions' []     = True
-isConjunctionOfDisjunctions' (x:xs) = case x of
+isConjunctionOfDisjunctions' (x:xs) = if xs == [] then True else
+                                      case x of
                                       TokenOP   {} -> isConjunctionOfDisjunctions' xs
                                       TokenInt  {} -> isConjunctionOfDisjunctions' xs
                                       TokenNeg  {} -> case head xs of
                                           TokenInt  {} -> isConjunctionOfDisjunctions' xs
                                           _ -> False
-                                      TokenCnj  {} -> isConjunctionOfDisjunctions' xs
+                                      TokenCnj  {} -> case head xs of
+                                          TokenOP   {} -> isConjunctionOfDisjunctions' xs
+                                          _ -> False
                                       TokenDsj  {} ->  case head xs of
-                                          TokenInt  {} -> isConjunctionOfDisjunctions' xs
-                                          TokenNeg  {} -> isConjunctionOfDisjunctions' xs
+                                          TokenOP   {} -> isConjunctionOfDisjunctions' xs
                                           _ -> False
                                       TokenCP   {} -> case head xs of
-                                          TokenCnj {} -> isConjunctionOfDisjunctions' xs
+                                          TokenDsj {} -> isConjunctionOfDisjunctions' xs
                                           TokenCP  {} -> isConjunctionOfDisjunctions' xs
                                           _ -> False
-                                      TokenEquiv{} -> False
-                                      TokenImpl {} -> False
+                                      _ -> False
 
 
 isDisjunctionOfLiterals :: Form -> Bool
@@ -83,9 +103,13 @@ isDisjunctionOfLiterals f = isDisjunctionOfLiterals' $ lexer $ show $ convertFor
 isDisjunctionOfLiterals' :: [Token] -> Bool
 isDisjunctionOfLiterals' []     = True
 isDisjunctionOfLiterals' (x:xs) = case x of
-                                      TokenOP   {} -> case head xs of
-                                          TokenCP  {} -> isDisjunctionOfLiterals' xs
-                                          TokenDsj {} -> isDisjunctionOfLiterals' xs
+                                      TokenDsj  {} ->  case head xs of
+                                          TokenOP  {} -> isDisjunctionOfLiterals' xs
+                                          _ -> False
+                                      TokenInt  {} -> case head xs of
+                                          TokenNeg  {} -> isDisjunctionOfLiterals' xs
+                                          TokenInt  {} -> isDisjunctionOfLiterals' xs
+                                          TokenCP   {} -> isDisjunctionOfLiterals' xs
                                           _ -> False
                                       _  -> isDisjunctionOfLiterals' xs
 
