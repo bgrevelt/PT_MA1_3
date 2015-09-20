@@ -63,7 +63,7 @@ xs = [
       -- testing whitespaces
       (" *  (  1 + ( 2 - 3 ) )",  "[*(1 +(2 -3))]"), 
       -- testing combination of negation, disjunction, conjunction and equivalence
-      ("*(2 -3)<==>-*(9 3)",       "[*(2 -3)<==>-*(9 3)]"),
+      ("*(2 -3)<=>-*(9 3)",       "[*(2 -3)<=>-*(9 3)]"),
       -- testing combination of negation, disjunction, conjunction and implication
       ("*(2 -3)==>-+(9 3)",       "[*(2 -3)==>-+(9 3)]")
       ]
