@@ -1,5 +1,5 @@
 {--
-      Time spent: 20 minutes
+      Time spent: 2 hours
 --}
 
 import Data.Tuple
@@ -14,6 +14,6 @@ r @@ s =
   nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
   
 trClos :: Ord a => Rel a -> Rel a
-trClos x | x == rest = x
+trClos x | x == rest = sort x
          | otherwise = trClos rest 
          where rest = nub (x ++ (x @@ x))       -- Probably want us to use the operator, would prefer using nub once
