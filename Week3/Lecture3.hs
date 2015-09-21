@@ -121,19 +121,6 @@ data Form = Prop Name
           | Equiv Form Form
           deriving Eq
 
-instance Arbitrary Form where
-  arbitrary = sized $ \n ->
-    oneof $
-      [ Prop <$> arbitrary ]
-      ++ if n == 0
-         then [] -- No recursion at size 0
-         else resize (n - 1) <$>
-           [ Neg <$> arbitrary
-           , Cnj <$> arbitrary
-           , Dsj <$> arbitrary
-           , Impl <$> arbitrary <*> arbitrary
-           , Equiv <$> arbitrary <*> arbitrary ]
-
 instance Show Form where
   show (Prop x)   = show x
   show (Neg f)    = '-' : show f

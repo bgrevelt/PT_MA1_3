@@ -32,7 +32,7 @@ reorder (Cnj (n : xs)) x =                                      -- For the form 
   Cnj [reorder n x, reorder (Cnj xs) x]
 reorder n (Cnj (x : xs)) =                                      -- Same also recheck the form Cnj
   Cnj [reorder n x, reorder n (Cnj xs)]                         -- Create a conjuction of the set Form n x, Form n xs
-reorder n x              = Dsj [n,x]                            -- If both are disjunctions this is good since this is allowed
+reorder n x              = Dsj [n, x]                           -- If both are disjunctions this is good since this is allowed
 
 
 --
@@ -42,13 +42,9 @@ fix :: Form -> Form
 fix (Cnj []) = Cnj []                                           -- Base case
 fix (Cnj x) = Cnj (fixConjuction x)                             -- If conjuction then fix that
 fix (Dsj []) = Dsj []                                           -- Base case
--- This is not a typo vvvvvvvvvv
-fix (Dsj x) = Dsj (fixConjuction x)                             -- Same but then for Disjunction
+fix (Dsj x) = Dsj (fixDisjunction x)                            -- Same but then for Disjunction
 fix x = x                                                       -- Don't touch anything else (properties etc)
 
-
--- TODO: This is really ugly I would love this to be 1 function but it doesn't go that well with having to call it recursively
--- TODO: There can be things inside these so that's what makes it a bit more complicated...
 fixConjuction :: [Form] -> [Form]
 fixConjuction [] = []                                           -- Return if empty list base case
 fixConjuction ((Cnj x) : xs) = fixConjuction (x ++ xs)          -- for each conjuction in the form we add it to the list
