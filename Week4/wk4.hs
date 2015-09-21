@@ -24,9 +24,8 @@ genSetList = do
   
 
 instance Arbitrary (Set Int) where
-  arbitrary = do
-	  n <- choose (0, 10)
-	  xs <- vectorOf n (choose ( 1, 100))
+  arbitrary = sized $ \s -> do
+	  xs <- vectorOf (min s 100) (choose ( 1, 100))
 	  return (list2set xs)
 
 
@@ -52,3 +51,32 @@ setDiff (Set as) (Set bs) = add (notInSet (Set as) (Set bs)) (notInSet (Set bs) 
 notInSet :: (Ord a) => Set a -> Set a -> Set a
 notInSet (Set as) (Set []) = (Set [])
 notInSet (Set as) (Set (b:bs)) = if (elem b as) then (notInSet (Set as) (Set bs)) else insertSet b (notInSet (Set as) (Set bs))
+
+-- propUnion tests if the result of the setUnion functions is a union
+-- According to the isUnion property
+propUnion :: Set Int -> Set Int -> Bool
+propUnion (Set a) (Set b) = isUnion (Set a) (Set b) (setUnion (Set a) (Set b))
+
+-- Is union is a wrapper that tests two things
+--- Are all the elements of first the two sets also elements of the third set
+--- Are all elements in the third set in either the first or the second set
+isUnion :: Ord a => Set a -> Set a -> Set a -> Bool
+isUnion (Set a) (Set b) (Set y) = allIn (Set a) (Set b) (Set y) && consistOf (Set a) (Set b) (Set y)
+
+consistOf :: Ord a => Set a -> Set a -> Set a -> Bool
+consistOf (Set y) (Set a) (Set b) = (remove a (remove b y)) == [] where
+	remove [] ys = ys
+	remove (a:as) ys = remove as (delete a ys) 
+
+-- Other implementation for consistOf seems to be more readable	
+consistOf' :: Ord a => Set a -> Set a -> Set a -> Bool
+consistOf' (Set []) _ _ = True
+consistOf' (Set (y:ys)) (Set a) (Set b)	 = (elem y a || elem y b) && consistOf (Set ys) (Set a) (Set b)
+
+allIn :: Ord a => Set a -> Set a -> Set a -> Bool
+allIn (Set a) (Set b) (Set y) = (allIn' a y) && (allIn' b y) where
+	allIn' [] _ = True
+	allIn' (a:as) ys = elem a ys && allIn' as ys
+	
+isProperSet :: Set Int -> Bool
+isProperSet (Set s) = list2set s == (Set s)
