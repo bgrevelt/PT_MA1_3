@@ -85,15 +85,15 @@ diffAllNotMutalInInOut (Set a) (Set b) = let (Set d) = setDiff (Set a) (Set b) i
 test :: IO()
 test = do 
 	-- union
-	a <- (quickCheck (isProperSet setUnion))
-	b <- (quickCheck unionAllOutputInInput)
-	c <- (quickCheck unionAllInputInOutput) 
+	a <- (quickCheckWith stdArgs { maxSuccess = 1000 } (isProperSet setUnion))
+	b <- (quickCheckWith stdArgs { maxSuccess = 1000 } unionAllOutputInInput)
+	c <- (quickCheckWith stdArgs { maxSuccess = 1000 } unionAllInputInOutput) 
 	-- intersection
-	c <- (quickCheck (isProperSet setIntersect))
-	d <- (quickCheck intAllOutputInBothIn)
-	e <- (quickCheck intBothInInOut)
+	c <- (quickCheckWith stdArgs { maxSuccess = 1000 } (isProperSet setIntersect))
+	d <- (quickCheckWith stdArgs { maxSuccess = 1000 } intAllOutputInBothIn)
+	e <- (quickCheckWith stdArgs { maxSuccess = 1000 } intBothInInOut)
 	-- difference
-	f <- (quickCheck (isProperSet setDiff))
-	g <- (quickCheck diffAllOutInOneIn)
-	h <- (quickCheck diffAllNotMutalInInOut)
+	f <- (quickCheckWith stdArgs { maxSuccess = 1000 } (isProperSet setDiff))
+	g <- (quickCheckWith stdArgs { maxSuccess = 1000 } diffAllOutInOneIn)
+	h <- (quickCheckWith stdArgs { maxSuccess = 1000 } diffAllNotMutalInInOut)
 	return a
