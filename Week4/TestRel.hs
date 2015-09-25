@@ -8,6 +8,46 @@ where
 import Closures
 import Data.List
 import Test.QuickCheck
+
+{------------------- Generator ----------------}
+{--
+The way I have implemented automatic generation by quickCheck 
+may not be optimal, so allow me to explain:
+At first I tried to use QuickChecks standard generator to generate
+Rel's. This works, but the result contains duplicates. As I could not
+get my custom generator to work, I decided to continue with the standard
+generator and sort and remove duplicates in each testable property.
+
+Now I'm at a point where I finally managed to get a generator up and running
+but if I understand correctly, we will need to use newtype for the relation
+instead of type because otherwise QuickCheck will not be able to distinguish
+between [(a),(a)] and Rel a. The problem was that if I change
+type Rel a = Rel [(a,a)] to newtype Rel a = Rel [(a,a)], I will need to change 
+all code that uses relation by adding (Rel <var>) around all Rel type variables
+This is a lot of work which does not really seem to bring us any benefits. 
+Quite the opposite, it makes handing the Rel type as as the standard [(a,a)] type
+harder sometimes.
+To work around this, I create a new type "Relation" which is basically the same
+type as Rel. I will define this as a new type and only use it as input parameter
+for testable properties. This way quickcheck will use my generator for all the
+testable properties without the need to change all of my code to use the new type
+--}
+
+newtype Relation a = Relation [(a, a)] deriving (Eq,Ord)
+
+instance (Show a) => Show (Relation a) where
+    showsPrec _ (Relation s) str = showRel s str
+
+showRel []     str = showString "{}" str
+showRel (x:xs) str = showChar '{' ( shows x ( showl xs str))
+     where showl []     str = showChar '}' str
+           showl (x:xs) str = showChar ',' (shows x (showl xs str))
+		   
+
+instance Arbitrary (Relation Int) where
+         arbitrary = do
+              rs <- arbitrary :: Gen [(Int,Int)]
+              return (Relation (sort $ nub rs))
  
 {----------- Some helper functions -------------}
 -- transR: Determine if a relation is transitive. 
@@ -38,54 +78,51 @@ dropOneSubLists xs = dropOneSubLists' xs ((length xs)-1) where
 
 -- Set X must be a subset of the symmetric closure of set X
 symSubSet :: Rel Int -> Bool
-symSubSet r = let rel = sort $ nub r in	-- This is a bit ugly. I could not figure out 
-								-- how to write a generator for relations and
-								-- the standard one includes non-unique elements
-	subRel rel (symClos rel)
+symSubSet r = subRel r (symClos r)
+
 
 -- The symmetric closure of set X must be symmetric	
-symMetric :: Rel Int -> Bool
-symMetric r = let sc = symClos (sort $ nub r) in
-	all (\(x,y) -> (elem (y,x) sc)) sc
+symMetric :: Relation Int -> Bool
+symMetric (Relation r) =
+	all (\(x,y) -> (elem (y,x) (symClos r))) r
 
 -- The symmetric closure of set X must be the smallest possilbe set for 
 -- which the previous two properties hold. We check this by making sure
 -- that for each element (x,y) in the SC, either (x,y) or (y,x) is part of X	
-symSmallest :: Rel Int -> Bool
-symSmallest r = let rel = sort $ nub r in
-	all (\(x,y) -> ((elem (y,x) r) || (elem (x,y) r))) (symClos rel)
+symSmallest :: Relation Int -> Bool
+symSmallest (Relation r) = 
+	all (\(x,y) -> ((elem (y,x) r) || (elem (x,y) r))) (symClos r)
 
 
 {-- Transitive closure properties for quickcheck --}
 
 -- Set X must be a subset of the transitive closure of set X
-transSubSet :: Rel Int -> Bool
-transSubSet r = let rel = sort $ nub r in
-	subRel rel (trClos rel)
+transSubSet :: Relation Int -> Bool
+transSubSet (Relation r) =
+	subRel r (trClos r)
 
 -- The transitive closure of set X must be transitive
-transItive :: Rel Int -> Bool
-transItive r = let tc = trClos (sort $ nub r) in
-	transR tc
+transItive :: Relation Int -> Bool
+transItive (Relation r) = transR (trClos r)
 
 -- The transitive closure of set X must be the smallest set that has the 
 -- two previous properties. In other words: every element in the set must
 -- be there for the set to be a TC. We test this by checking for all 
 -- subsets of the TC which are one element shorter than the TC, that that
 -- set is either not a superset of X or not transitive.	
-transSmallest :: Rel Int -> Bool
-transSmallest r = let rel = sort $ nub r in
-	all (\x -> not ((subRel rel x) && (transR x))) (dropOneSubLists (trClos rel))
+transSmallest :: Relation Int -> Bool
+transSmallest (Relation r) = 
+	all (\x -> not ((subRel r x) && (transR x))) (dropOneSubLists (trClos r))
 	
-propNonDupl :: (Rel Int -> Rel Int) -> Rel Int ->Bool
-propNonDupl f r = let x = f (sort $ nub r) in x == nub x
+propNonDupl :: (Rel Int -> Rel Int) -> Relation Int ->Bool
+propNonDupl f (Relation r) = r == nub r
 
-propSorted :: (Rel Int -> Rel Int) -> Rel Int ->Bool
-propSorted f r = let x = f (sort $ nub r) in x == sort x
+propSorted :: (Rel Int -> Rel Int) -> Relation Int ->Bool
+propSorted f (Relation r) = r == sort r
 
 -- TC of SC == SC of TC
-prop_Q8 :: Rel Int -> Bool
-prop_Q8 r = trClos (symClos r) == symClos (trClos r)
+prop_Q8 :: Relation Int -> Bool
+prop_Q8 (Relation r) = trClos (symClos r) == symClos (trClos r)
 -- *TestRel> quickCheck prop_Q8 
 -- *** Failed! Falsifiable (after 2 tests and 1 shrink):    
 
