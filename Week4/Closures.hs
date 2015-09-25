@@ -7,7 +7,7 @@ import SetOrd
 type Rel a = [(a, a)]
 
 symClos :: Ord a => Rel a -> Rel a
-symClos x = x ++ (map swap x)
+symClos x = sort $ nub (x ++ (map swap x))
 
 infixr 5 @@
 
@@ -17,8 +17,8 @@ r @@ s =
 
   
 trClos :: Ord a => Rel a -> Rel a
-trClos x | x == rest = x
-         | otherwise = trClos' rest 
+trClos x | x == rest = (sort x)
+         | otherwise = trClos rest 
          where rest = nub (x ++ (x @@ x))       -- Probably want us to use the operator, would prefer using nub once
 
 {-- 

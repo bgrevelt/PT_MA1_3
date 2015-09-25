@@ -17,3 +17,12 @@ let T =
       = [(1,2),(2,3),(3,4),(2,1),(3,2),(4,3),(1,3),(1,1),(2,4),(2,2),(3,3),(3,1),(4,4),(4,2),(1,4),(4,1)]
       
 So they are not equal in this specific case which indicate that there is a difference.
+
+
+{-- 
+Bouke:
+Even easier one (generated with quickCheck):
+[(0,1)]
+[(0,1)] -> TC -> [(0,1)] -> SC -> [(0,1),(1,0)]
+[(0,1)] -> SC -> [(0,1),(1,0)] -> TC -> [(0,0),(0,1),(1,0),(1,1)]
+ }
