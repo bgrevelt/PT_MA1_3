@@ -9,6 +9,7 @@ import Lecture2
 import SetOrd
 import Test.QuickCheck
 import SetOperations
+import Data.List
 
 {--
 Implement a random data generator for the datatype Set Int, where Set is as defined in SetOrd.hs. 
@@ -37,9 +38,13 @@ instance Arbitrary (Set Int) where
 -- first argument. The 2nd and 3rd arguments are two sets. The function is
 -- then applied to these two sets and we check if the resulting set is 
 -- properly formed (e.g sorted and unique)
-isProperSet :: (Set Int -> Set Int -> Set Int) -> Set Int -> Set Int -> Bool
-isProperSet f (Set a) (Set b) = let (Set y) = f (Set a) (Set b) in
-	list2set y == (Set y)
+nonDuplSet :: (Set Int -> Set Int -> Set Int) -> Set Int -> Set Int -> Bool
+nonDuplSet f (Set a) (Set b) = let (Set y) = f (Set a) (Set b) in
+	nub y == y
+	
+sortedSet :: (Set Int -> Set Int -> Set Int) -> Set Int -> Set Int -> Bool
+sortedSet f (Set a) (Set b) = let (Set y) = f (Set a) (Set b) in
+	sort y == y
 
 {-- Testable properties for union --}
 -- Checks if all elements in the output of the union function are elements
@@ -80,18 +85,25 @@ diffAllNotMutalInInOut (Set a) (Set b) = let (Set d) = setDiff (Set a) (Set b) i
 	(all (\x -> (elem x b) || (elem x d)) a) 
 
 
-test :: IO()
-test = do 
+{-- function below is for debugging / informational purposes only. 
+	We are fairly sure that this is not the right way to do this, 
+	but it is convenient to have a function that runs all the tests
+--}
+testSetProperties :: IO()
+testSetProperties = do 
 	-- union
-	a <- (quickCheckWith stdArgs { maxSuccess = 1000 } (isProperSet setUnion))
-	b <- (quickCheckWith stdArgs { maxSuccess = 1000 } unionAllOutputInInput)
-	c <- (quickCheckWith stdArgs { maxSuccess = 1000 } unionAllInputInOutput) 
+	a <- (quickCheckWith stdArgs { maxSuccess = 1000 } (nonDuplSet setUnion))
+	b <- (quickCheckWith stdArgs { maxSuccess = 1000 } (sortedSet setUnion))
+	c <- (quickCheckWith stdArgs { maxSuccess = 1000 } unionAllOutputInInput)
+	d <- (quickCheckWith stdArgs { maxSuccess = 1000 } unionAllInputInOutput) 
 	-- intersection
-	c <- (quickCheckWith stdArgs { maxSuccess = 1000 } (isProperSet setIntersect))
-	d <- (quickCheckWith stdArgs { maxSuccess = 1000 } intAllOutputInBothIn)
-	e <- (quickCheckWith stdArgs { maxSuccess = 1000 } intBothInInOut)
+	e <- (quickCheckWith stdArgs { maxSuccess = 1000 } (nonDuplSet setIntersect))
+	f <- (quickCheckWith stdArgs { maxSuccess = 1000 } (sortedSet setIntersect))
+	g <- (quickCheckWith stdArgs { maxSuccess = 1000 } intAllOutputInBothIn)
+	h <- (quickCheckWith stdArgs { maxSuccess = 1000 } intBothInInOut)
 	-- difference
-	f <- (quickCheckWith stdArgs { maxSuccess = 1000 } (isProperSet setDiff))
-	g <- (quickCheckWith stdArgs { maxSuccess = 1000 } diffAllOutInOneIn)
-	h <- (quickCheckWith stdArgs { maxSuccess = 1000 } diffAllNotMutalInInOut)
+	i <- (quickCheckWith stdArgs { maxSuccess = 1000 } (nonDuplSet setDiff))
+	j <- (quickCheckWith stdArgs { maxSuccess = 1000 } (sortedSet setDiff))
+	l <- (quickCheckWith stdArgs { maxSuccess = 1000 } diffAllOutInOneIn)
+	m <- (quickCheckWith stdArgs { maxSuccess = 1000 } diffAllNotMutalInInOut)
 	return a
