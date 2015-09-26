@@ -107,3 +107,43 @@ testSetProperties = do
 	l <- (quickCheckWith stdArgs { maxSuccess = 1000 } diffAllOutInOneIn)
 	m <- (quickCheckWith stdArgs { maxSuccess = 1000 } diffAllNotMutalInInOut)
 	return a
+	
+	
+	
+{-
+Automated test of sets without quickCheck
+-}	
+message :: Bool -> IO()
+message True = putStrLn "test passed"  
+message False = putStrLn "test failed"  
+
+
+
+myTestSet :: (Set Int -> Set Int -> Bool) -> IO ()
+myTestSet function = do 
+  a <- genSetList
+  b <- genSetList
+  c <- (message (function a b))
+  return c
+
+myTestSet2 :: (t -> Set Int -> Set Int -> Bool) -> t -> IO ()
+myTestSet2 property function = do 
+  a <- genSetList
+  b <- genSetList
+  c <- (message (property function a b))
+  return c
+
+test1 = myTestSet2 nonDuplSet setUnion
+test2 = myTestSet2 sortedSet setUnion
+test3 = myTestSet unionAllOutputInInput
+test4 = myTestSet unionAllOutputInInput
+test5 = myTestSet2 nonDuplSet setIntersect
+test6 = myTestSet2 sortedSet setIntersect
+test7 = myTestSet intAllOutputInBothIn 
+test8 = myTestSet intBothInInOut
+test9 = myTestSet2 nonDuplSet setDiff
+
+test10 = myTestSet2 sortedSet setDiff
+test11 = myTestSet intBothInInOut
+test12 = myTestSet diffAllOutInOneIn 
+test13 = myTestSet diffAllNotMutalInInOut 
