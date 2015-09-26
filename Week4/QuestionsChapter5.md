@@ -22,17 +22,19 @@ Do we need to know the differences between pre-order, strict partial order, part
 ##Question 3
 I do not understand Example 5.43. Because I do not understand ∈^+. Could this be explained?
 
-> Example 5.43 	If A={a,{b,{c}}},then
+> Example 5.43 	
+> 
+> If A={a,{b,{c}}},then
 > >a ∈^+ A, {b,{c}} ∈^+ A, b ∈^+ A, {c} ∈^+ A and c ∈^+ A. 
 
-##Question 3
+##Question 4
 What does the sign ⊢ mean?
 What does the sign |= mean?
 
-##Question 4
+##Question 5
 y@(y:ys). What does this mean?
 
-##Question 5
+##Question 6
 R^−1 means symmetric, R^* means transitive and reflexive.
 
 What does R^+ mean?
