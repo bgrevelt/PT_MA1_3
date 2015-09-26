@@ -2,6 +2,7 @@ Is there a difference between the symmetric closure of the transitive closure
 of a relation R and the transitive closure of the symmetric closure of R
 
 This was found using quickcheck:
+*TestRel> quickCheck prop_Q8
 
 > trClos [(0,1)]
       = [(0,1)]
