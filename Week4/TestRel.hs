@@ -69,8 +69,12 @@ transItive r = let tc = trClos (sort $ nub r) in
 	transR tc
 
 -- The transitive closure of set X must be the smallest set that has the 
--- two previous properties. In other words: every element in the set must
--- be there for the set to be a TC. We test this by checking for all 
+-- two previous properties. 
+-- The easiest way to verify this would be to take the superset of the
+-- proposed TC and test for all subsets if none of them is a TC. However
+-- we feel that that we can do this 'cheaper' using the following rationale: 
+-- Every element in the set must be there for the set to be a TC.
+-- We test this by checking for all 
 -- subsets of the TC which are one element shorter than the TC, that that
 -- set is either not a superset of X or not transitive.	
 transSmallest :: Rel Int -> Bool
@@ -88,9 +92,14 @@ prop_Q8 :: Rel Int -> Bool
 prop_Q8 r = trClos (symClos r) == symClos (trClos r)
 -- *TestRel> quickCheck prop_Q8 
 -- *** Failed! Falsifiable (after 2 tests and 1 shrink):    
+-- [(0,1)]
 
-test :: IO()
-test = do 
+{-- function below is for debugging / informational purposes only. 
+	We are fairly sure that this is not the right way to do this, 
+	but it is convenient to have a function that runs all the tests
+--}
+testRelProperties :: IO()
+testRelProperties = do 
 	-- Symmetric closure
 	print "Symmetric closure is superset of input set"
 	a <- (quickCheckWith stdArgs { maxSuccess = 1000 } symSubSet)
