@@ -23,7 +23,7 @@ transR s = and [ trans pair s | pair <- s ] where
 -- SubRel: Determine if the lhs relation is a subset of the rhs relation
 subRel :: Rel Int -> Rel Int -> Bool
 subRel [] _ = True
-subRel (s:sub) sup = elem s sup && subRel sub sup
+subRel (s:sub) sup = s `elem` sup && subRel sub sup
 
 -- Turn a list of n elements into a list of all sublists of size n-1
 dropOneSubLists :: [a] -> [[a]]
@@ -46,14 +46,14 @@ symSubSet r = let rel = sort $ nub r in	-- This is a bit ugly. I could not figur
 -- The symmetric closure of set X must be symmetric	
 symMetric :: Rel Int -> Bool
 symMetric r = let sc = symClos (sort $ nub r) in
-	all (\(x,y) -> (elem (y,x) sc)) sc
+	all (\(x,y) -> ((y,x) `elem` sc)) sc
 
 -- The symmetric closure of set X must be the smallest possilbe set for 
 -- which the previous two properties hold. We check this by making sure
 -- that for each element (x,y) in the SC, either (x,y) or (y,x) is part of X	
 symSmallest :: Rel Int -> Bool
 symSmallest r = let rel = sort $ nub r in
-	all (\(x,y) -> ((elem (y,x) r) || (elem (x,y) r))) (symClos rel)
+	all (\(x,y) -> (((y,x) `elem` r) || ((x,y) `elem` r))) (symClos rel)
 
 
 {-- Transitive closure properties for quickcheck --}

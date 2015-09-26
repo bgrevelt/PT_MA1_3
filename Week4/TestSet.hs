@@ -56,33 +56,33 @@ unionAllOutputInInput (Set a) (Set b) = let (Set u) = setUnion (Set a) (Set b) i
 -- Checks if all elements in the input sets are also elements in the output set
 unionAllInputInOutput :: Set Int -> Set Int -> Bool
 unionAllInputInOutput (Set a) (Set b) = let (Set u) = setUnion (Set a) (Set b) in
-	(all (\x -> (elem x u)) a) && (all (\x -> (elem x u)) b)
+	(all (\x -> (x `elem` u)) a) && (all (\x -> (x `elem` u)) b)
 
 {-- Testable properties for intersection --}
 -- Checks if all elements in the set that's the output of the intersec 
 -- function are elements in both input sets
 intAllOutputInBothIn :: Set Int -> Set Int -> Bool
 intAllOutputInBothIn (Set a) (Set b) = let (Set i) = setIntersect (Set a) (Set b) in
-	all (\x -> ((elem x a) && (elem x b))) i
+	all (\x -> ((x `elem` a) && (x `elem` b))) i
 
 -- Checks if all elements that are present in both input sets of the 
 -- intersect function are also elements in the output set of the intersect
 -- function	
 intBothInInOut :: Set Int -> Set Int -> Bool
 intBothInInOut (Set a) (Set b) = let (Set i) = setIntersect (Set a) (Set b) in
-	all (\x -> (not (elem x b)) || (elem x i)) a
+	all (\x -> (not (x `elem` b)) || (x `elem` i)) a
 	
 -- Check if all elements in the output set of the intersect function are 
 -- elements of set a and not of set b	
 diffAllOutInOneIn :: Set Int -> Set Int -> Bool
 diffAllOutInOneIn (Set a) (Set b) = let (Set d) = setDiff (Set a) (Set b) in
-	all (\x -> ((elem x a) && not (elem x b))) d
+	all (\x -> ((x `elem` a) && not (x `elem` b))) d
 
 -- Check if each element in set a that is not an element of set b is in the 
 -- diff set
 diffAllNotMutalInInOut :: Set Int -> Set Int -> Bool
 diffAllNotMutalInInOut (Set a) (Set b) = let (Set d) = setDiff (Set a) (Set b) in
-	(all (\x -> (elem x b) || (elem x d)) a) 
+	(all (\x -> (x `elem` b) || (x `elem` d)) a) 
 
 
 {-- function below is for debugging / informational purposes only. 
