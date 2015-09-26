@@ -2,6 +2,8 @@
       Time spent: 2 hours
 --}
 
+module Closures where
+
 import Data.Tuple
 import Data.List
 
