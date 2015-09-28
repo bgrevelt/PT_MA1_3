@@ -17,6 +17,9 @@
   blocks :: [[Int]]
   blocks = [[1..3],[4..6],[7..9]]
 
+  nrcBlock :: [[Int]]
+  nrcBlock = [[2..4],[6..8]]
+
   showVal :: Value -> String
   showVal 0 = " "
   showVal d = show d
@@ -65,9 +68,15 @@
   bl :: Int -> [Int]
   bl x = concat $ filter (elem x) blocks 
 
+  nrcBl :: Int -> [Int]
+  nrcBl x = concat $ filter (elem x) nrcBlock
+
   subGrid :: Sudoku -> (Row,Column) -> [Value]
   subGrid s (r,c) = 
     [ s (r',c') | r' <- bl r, c' <- bl c ]
+
+  subBlock :: Sudoku -> (Row,Column) -> [Value]
+  subBlock s (r, c) = [ s (r',c')| r' <- nrcBl r ,c' <- nrcBl c]
 
   freeInSeq :: [Value] -> [Value]
   freeInSeq seq = values \\ seq 
@@ -83,11 +92,18 @@
   freeInSubgrid :: Sudoku -> (Row,Column) -> [Value]
   freeInSubgrid s (r,c) = freeInSeq (subGrid s (r,c))
 
+  freeInNrcgrid :: Sudoku -> (Row,Column) -> [Value]
+  freeInNrcgrid s (r,c) = freeInSeq (subBlock s (r,c))
+
+  freeNrc :: Sudoku -> (Row,Column) -> [Value]
+  freeNrc s (r, c) = if r `elem` (concat nrcBlock) && c `elem` (concat nrcBlock) then (freeInNrcgrid s (r,c)) else values
+
   freeAtPos :: Sudoku -> (Row,Column) -> [Value]
   freeAtPos s (r,c) = 
     (freeInRow s r) 
      `intersect` (freeInColumn s c) 
      `intersect` (freeInSubgrid s (r,c)) 
+     `intersect` (freeNrc s (r,c))
 
   injective :: Eq a => [a] -> Bool
   injective xs = nub xs == xs
@@ -104,6 +120,10 @@
   subgridInjective s (r,c) = injective vs where 
      vs = filter (/= 0) (subGrid s (r,c))
 
+  nrcgridInjective :: Sudoku -> (Row,Column) -> Bool
+  nrcgridInjective s (r,c) = injective vs where
+     vs = filter (/= 0) (subBlock s (r,c))
+
   consistent :: Sudoku -> Bool
   consistent s = and $
                  [ rowInjective s r |  r <- positions ]
@@ -112,6 +132,9 @@
                   ++
                  [ subgridInjective s (r,c) | 
                       r <- [1,4,7], c <- [1,4,7]]
+		  ++
+		 [ nrcgridInjective s (r,c) |
+		      r <- [2, 6], c <- [2, 6]]
 
   extend :: Sudoku -> ((Row,Column),Value) -> Sudoku
   extend = update
@@ -146,10 +169,14 @@
     | c == y = (x,y,zs\\[v]) : prune (r,c,v) rest
     | sameblock (r,c) (x,y) = 
           (x,y,zs\\[v]) : prune (r,c,v) rest
+    | nrcblock (r,c) (x,y) = (x,y,zs\\[v]) : prune (r,c,v) rest
     | otherwise = (x,y,zs) : prune (r,c,v) rest
   
   sameblock :: (Row,Column) -> (Row,Column) -> Bool
   sameblock (r,c) (x,y) = bl r == bl x && bl c == bl y 
+
+  nrcblock :: (Row, Column) -> (Row,Column) -> Bool
+  nrcblock (r,c) (x,y) = nrcBl r == nrcBl x && nrcBl c == nrcBl y
 
   initNode :: Grid -> [Node]
   initNode gr = let s = grid2sud gr in 
@@ -252,6 +279,20 @@
               [0,0,0,0,0,0,0,8,0],
               [0,0,0,0,0,0,0,0,9]]
 
+  gridExercise1 :: Grid
+  gridExercise1 = [[0,0,0,3,0,0,0,0,0],
+              [0,0,0,7,0,0,3,0,0],
+              [2,0,0,0,0,0,0,0,8],
+              [0,0,6,0,0,5,0,0,0],
+              [0,9,1,6,0,0,0,0,0],
+              [3,0,0,0,7,1,2,0,0],
+              [0,0,0,0,0,0,0,3,1],
+              [0,8,0,0,4,0,0,0,0],
+              [0,0,2,0,0,0,0,0,0]]
+
+  solution1 :: Grid
+  solution1 = [[1, 4, 5, 9, 8, 2, 3, 6, 7],[6, 2, 7, 1, 3, 4, 9, 5, 8],[8, 9, 3, 7, 6, 5, 1, 4, 2],[3, 5, 1, 4, 9, 8, 2, 7, 6],[4, 6, 9, 2, 5, 7, 8, 3, 1],[7, 8, 2, 3, 1, 6, 5, 9, 4],[2, 3, 8, 6, 4, 9, 7, 1, 5],[9, 7, 6, 5, 2, 1, 4, 8, 3],[5, 1, 4, 8, 7, 3, 6, 2, 9]]
+
   emptyN :: Node
   emptyN = (\ _ -> 0,constraints (\ _ -> 0))
 
@@ -271,79 +312,78 @@
                       else do ys <- randomize (xs\\y)
                               return (head y:ys)
 
-  sameLen :: Constraint -> Constraint -> Bool
-  sameLen (_,_,xs) (_,_,ys) = length xs == length ys
+sameLen :: Constraint -> Constraint -> Bool
+sameLen (_,_,xs) (_,_,ys) = length xs == length ys
 
-  getRandomCnstr :: [Constraint] -> IO [Constraint]
-  getRandomCnstr cs = getRandomItem (f cs) 
-    where f [] = []
-          f (x:xs) = takeWhile (sameLen x) (x:xs)
+getRandomCnstr :: [Constraint] -> IO [Constraint]
+getRandomCnstr cs = getRandomItem (f cs) 
+  where f [] = []
+        f (x:xs) = takeWhile (sameLen x) (x:xs)
 
-  rsuccNode :: Node -> IO [Node]
-  rsuccNode (s,cs) = do xs <- getRandomCnstr cs
-                        if null xs 
-                          then return []
-                          else return 
-                            (extendNode (s,cs\\xs) (head xs))
+rsuccNode :: Node -> IO [Node]
+rsuccNode (s,cs) = do xs <- getRandomCnstr cs
+                      if null xs 
+                      then return []
+                      else return 
+                          (extendNode (s,cs\\xs) (head xs))
 
-  rsolveNs :: [Node] -> IO [Node]
-  rsolveNs ns = rsearch rsuccNode solved (return ns)
+rsolveNs :: [Node] -> IO [Node]
+rsolveNs ns = rsearch rsuccNode solved (return ns)
 
-  rsearch :: (node -> IO [node]) 
-              -> (node -> Bool) -> IO [node] -> IO [node]
-  rsearch succ goal ionodes = 
-    do xs <- ionodes 
-       if null xs 
-         then return []
-         else 
-           if goal (head xs) 
-             then return [head xs]
-             else do ys <- rsearch succ goal (succ (head xs))
-                     if (not . null) ys 
-                        then return [head ys]
-                        else if null (tail xs) then return []
-                             else 
-                               rsearch 
-                                 succ goal (return $ tail xs)
+rsearch :: (node -> IO [node]) 
+            -> (node -> Bool) -> IO [node] -> IO [node]
+rsearch succ goal ionodes = 
+  do xs <- ionodes 
+     if null xs 
+       then return []
+       else 
+         if goal (head xs) 
+           then return [head xs]
+           else do ys <- rsearch succ goal (succ (head xs))
+                   if (not . null) ys 
+                      then return [head ys]
+                      else if null (tail xs) then return []
+                           else 
+                             rsearch 
+                               succ goal (return $ tail xs)
 
-  genRandomSudoku :: IO Node
-  genRandomSudoku = do [r] <- rsolveNs [emptyN]
-                       return r
+genRandomSudoku :: IO Node
+genRandomSudoku = do [r] <- rsolveNs [emptyN]
+                    return r
 
-  randomS = genRandomSudoku >>= showNode
+randomS = genRandomSudoku >>= showNode
 
-  uniqueSol :: Node -> Bool
-  uniqueSol node = singleton (solveNs [node]) where 
-    singleton [] = False
-    singleton [x] = True
-    singleton (x:y:zs) = False
+uniqueSol :: Node -> Bool
+uniqueSol node = singleton (solveNs [node]) where 
+  singleton [] = False
+  singleton [x] = True
+  singleton (x:y:zs) = False
 
-  eraseS :: Sudoku -> (Row,Column) -> Sudoku
-  eraseS s (r,c) (x,y) | (r,c) == (x,y) = 0
-                       | otherwise      = s (x,y)
+eraseS :: Sudoku -> (Row,Column) -> Sudoku
+eraseS s (r,c) (x,y) | (r,c) == (x,y) = 0
+                     | otherwise      = s (x,y)
 
-  eraseN :: Node -> (Row,Column) -> Node
-  eraseN n (r,c) = (s, constraints s) 
-    where s = eraseS (fst n) (r,c) 
+eraseN :: Node -> (Row,Column) -> Node
+eraseN n (r,c) = (s, constraints s) 
+  where s = eraseS (fst n) (r,c) 
 
-  minimalize :: Node -> [(Row,Column)] -> Node
-  minimalize n [] = n
-  minimalize n ((r,c):rcs) | uniqueSol n' = minimalize n' rcs
-                           | otherwise    = minimalize n  rcs
-    where n' = eraseN n (r,c)
+minimalize :: Node -> [(Row,Column)] -> Node
+minimalize n [] = n
+minimalize n ((r,c):rcs) | uniqueSol n' = minimalize n' rcs
+                         | otherwise    = minimalize n  rcs
+  where n' = eraseN n (r,c)
 
-  filledPositions :: Sudoku -> [(Row,Column)]
-  filledPositions s = [ (r,c) | r <- positions,  
-                                c <- positions, s (r,c) /= 0 ]
+filledPositions :: Sudoku -> [(Row,Column)]
+filledPositions s = [ (r,c) | r <- positions,  
+                              c <- positions, s (r,c) /= 0 ]
 
-  genProblem :: Node -> IO Node
-  genProblem n = do ys <- randomize xs
-                    return (minimalize n ys)
-     where xs = filledPositions (fst n)
+genProblem :: Node -> IO Node
+genProblem n = do ys <- randomize xs
+                  return (minimalize n ys)
+   where xs = filledPositions (fst n)
 
-  main :: IO ()
-  main = do [r] <- rsolveNs [emptyN]
-            showNode r
-            s  <- genProblem r
-            showNode s
-
+main :: IO ()
+main = do [r] <- rsolveNs [emptyN]
+          showNode r
+          s  <- genProblem r
+          showNode s
