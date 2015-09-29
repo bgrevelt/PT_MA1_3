@@ -4,6 +4,9 @@ where
 import Data.List
 import System.Random
 
+{--
+  Time spent: 5 hours
+--}
 
 -- Test Report
 
