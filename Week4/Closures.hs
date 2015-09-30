@@ -10,7 +10,7 @@ import Data.List
 type Rel a = [(a, a)]
 
 symClos :: Ord a => Rel a -> Rel a
-symClos x = sort (nub $ x ++ (map swap x))
+symClos x = sort (nub $ x ++ map swap x)
 
 infixr 5 @@
 
