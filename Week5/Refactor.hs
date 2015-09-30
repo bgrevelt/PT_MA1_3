@@ -222,7 +222,7 @@ openPositions s = [ (r,c) | r <- positions,
 
 constraints :: Sudoku -> [Constraint] 
 constraints s = sortBy length3rd 
-    [(r,c, (freeAtPos s (r,c) (rowConstrnt ++ columnConstrnt ++ blockConstrnt))) | 
+    [(r,c, freeAtPos s (r,c) (rowConstrnt ++ columnConstrnt ++ blockConstrnt)) | 
                        (r,c) <- openPositions s ]
 
 data Tree a = T a [Tree a] deriving (Eq,Ord,Show)
@@ -241,7 +241,7 @@ search :: (node -> [node])
 search children goal [] = []
 search children goal (x:xs) 
   | goal x    = x : search children goal xs
-  | otherwise = search children goal ((children x) ++ xs)
+  | otherwise = search children goal (children x ++ xs)
 
 solveNs :: [Node] -> [Node]
 solveNs = search succNode solved 
@@ -324,10 +324,10 @@ example6 = [[0,0,0,0,5,0,0,0,0],
 
 
 emptyN :: Node
-emptyN = (\ _ -> 0,constraints (\ _ -> 0))
+emptyN = (const 0,constraints (const 0))
 
 getRandomInt :: Int -> IO Int
-getRandomInt n = getStdRandom (randomR (0,n))
+getRandomInt n = getStdRandom (randomR (0, n))
 
 getRandomItem :: [a] -> IO [a]
 getRandomItem [] = return []
@@ -352,10 +352,7 @@ getRandomCnstr cs = getRandomItem (f cs)
 
 rsuccNode :: Node -> IO [Node]
 rsuccNode (s,cs) = do xs <- getRandomCnstr cs
-                      if null xs 
-                      then return []
-                      else return 
-                          (extendNode (s,cs\\xs) (head xs))
+                      return (if null xs then [] else extendNode (s, cs \\ xs) (head xs))
 
 rsolveNs :: [Node] -> IO [Node]
 rsolveNs ns = rsearch rsuccNode solved (return ns)
