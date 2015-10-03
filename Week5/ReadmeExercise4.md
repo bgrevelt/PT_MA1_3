@@ -2,7 +2,7 @@
 
 
 ##Generator
-The generator can be found in exercise4.hs. 
+The generator can be found in Exercise4.hs. 
 
 
 ##Short report on findings
