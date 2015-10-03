@@ -1,6 +1,6 @@
 module Exercise4
 where 
-import Lecture5
+import Lecture5WithoutNRC
 import Data.Foldable
 import Data.List
 
