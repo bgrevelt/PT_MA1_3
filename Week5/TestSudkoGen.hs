@@ -301,7 +301,7 @@ allCoords = [ (r,c) | r <- positions, c <- positions ]
 
 -- Remove a single coordinate from the sudoku 
 dropCoord :: Sudoku -> (Row, Column) -> Sudoku
-dropCoord s (r,c) = if r'==r && c'==c then 0 else (s (r,c))
+dropCoord s (r,c) = if r'==r && c'==c then 0 else s (r,c)
 
 -- Check if a Sudoku has multiple solutions
 multSol :: Sudoku -> Bool
@@ -347,10 +347,10 @@ testGenSuds' k n f = if k == n then print (show n ++ " tests passed")
                   else 
                       do 
                           showSud "failed test on: " p                    
-                          error ("")
+                          error ""
 						  
 showSud :: String -> Node -> IO ()
 showSud pre s = do
     print pre
-    (showNode s)
+    showNode s
 	
