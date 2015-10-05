@@ -1,9 +1,61 @@
-module Lecture5
- 
-where 
-  
+{-# OPTIONS_GHC -Wall #-}
+module Refactor
+where
+
 import Data.List
 import System.Random
+
+{--
+  Time spent: 5 hours
+--}
+
+-- Test Report
+
+--
+-- next compare the two versions for extendability 
+-- 
+{--
+    It is very easy to extend the refactored version with an additional constraint     
+    when compared with the original which requires a lot more work. The problem is
+    that it is still needed to edit the pruned function and a lot of other data.
+
+    Because of this I concluded that this version is more extendable but still
+    contains horrible code.
+--}
+
+--
+-- and efficiency
+--
+{--
+    This has been tested using the +s flag and the profiler that comes with GHCI
+    to redo the tests use:
+        :set +s
+        compile with flag: -fprof-auto -prof -rtsopts
+        next run with: ./main +RTS -p
+
+    Refactored version:
+     total time  =          3.22 secs
+     total alloc = 1,235,034,472 bytes
+
+    Original version:
+     total time  =          3.07 secs 
+     total alloc = 1,237,536,048 bytes
+
+    For example 6 the original version is slightly slower but more efficient with 
+    memory. Hardly any difference at all actually, to make the tests as fair as
+    possible we ran 10 tests and took the averages (refactored -> original -> ref..)
+ 
+    Testing was done with:
+      Intel Core i7-5960X (@3.8GHz)
+      ASRock Fatal1ty X99 Professional motherboard
+      Kingston HyperX 16GB DDR4-2133
+      
+    Most efficient:
+      Memory:   Refactored
+      Speed:    Original
+--}
+
+
 
 type Row    = Int 
 type Column = Int 
@@ -17,8 +69,18 @@ values    = [1..9]
 blocks :: [[Int]]
 blocks = [[1..3],[4..6],[7..9]]
 
-nrcBlock :: [[Int]]
-nrcBlock = [[2..4],[6..8]]
+type Position = (Row,Column)
+type Constrnt = [[Position]]
+
+rowConstrnt = [[(r,c)| c <- values ] | r <- values ]
+columnConstrnt = [[(r,c)| r <- values ] | c <- values ]
+blockConstrnt = [[(r,c)| r <- b1, c <- b2 ] | b1 <- blocks, b2 <- blocks ]
+
+freeAtPos :: Sudoku -> Position -> Constrnt -> [Value]
+freeAtPos s (r,c) xs = let 
+   ys = filter (elem (r,c)) xs 
+ in 
+   foldl1 intersect (map ((values \\) . map s) ys)
 
 showVal :: Value -> String
 showVal 0 = " "
@@ -50,7 +112,7 @@ showGrid [as,bs,cs,ds,es,fs,gs,hs,is] = do
     showRow gs; showRow hs; showRow is
     putStrLn ("+-------+-------+-------+")
 
-type Sudoku = (Row,Column) -> Value
+type Sudoku = Position -> Value
 
 sud2grid :: Sudoku -> Grid
 sud2grid s = 
@@ -59,7 +121,7 @@ sud2grid s =
 grid2sud :: Grid -> Sudoku
 grid2sud gr = \ (r,c) -> pos gr (r,c) 
   where 
-  pos :: [[a]] -> (Row,Column) -> a 
+  pos :: [[a]] -> Position -> a 
   pos gr (r,c) = (gr !! (r-1)) !! (c-1)
 
 showSudoku :: Sudoku -> IO()
@@ -68,15 +130,9 @@ showSudoku = showGrid . sud2grid
 bl :: Int -> [Int]
 bl x = concat $ filter (elem x) blocks 
 
-nrcBl :: Int -> [Int]
-nrcBl x = concat $ filter (elem x) nrcBlock
-
-subGrid :: Sudoku -> (Row,Column) -> [Value]
+subGrid :: Sudoku -> Position -> [Value]
 subGrid s (r,c) = 
   [ s (r',c') | r' <- bl r, c' <- bl c ]
-
-subBlock :: Sudoku -> (Row,Column) -> [Value]
-subBlock s (r, c) = [ s (r',c')| r' <- nrcBl r ,c' <- nrcBl c]
 
 freeInSeq :: [Value] -> [Value]
 freeInSeq seq = values \\ seq 
@@ -89,21 +145,8 @@ freeInColumn :: Sudoku -> Column -> [Value]
 freeInColumn s c = 
   freeInSeq [ s (i,c) | i <- positions ]
 
-freeInSubgrid :: Sudoku -> (Row,Column) -> [Value]
+freeInSubgrid :: Sudoku -> Position -> [Value]
 freeInSubgrid s (r,c) = freeInSeq (subGrid s (r,c))
-
-freeInNrcgrid :: Sudoku -> (Row,Column) -> [Value]
-freeInNrcgrid s (r,c) = freeInSeq (subBlock s (r,c))
-
-freeNrc :: Sudoku -> (Row,Column) -> [Value]
-freeNrc s (r, c) = if r `elem` (concat nrcBlock) && c `elem` (concat nrcBlock) then (freeInNrcgrid s (r,c)) else values
-
-freeAtPos :: Sudoku -> (Row,Column) -> [Value]
-freeAtPos s (r,c) = 
-  (freeInRow s r) 
-   `intersect` (freeInColumn s c) 
-   `intersect` (freeInSubgrid s (r,c)) 
-   `intersect` (freeNrc s (r,c))
 
 injective :: Eq a => [a] -> Bool
 injective xs = nub xs == xs
@@ -116,13 +159,9 @@ colInjective :: Sudoku -> Column -> Bool
 colInjective s c = injective vs where 
    vs = filter (/= 0) [ s (i,c) | i <- positions ]
 
-subgridInjective :: Sudoku -> (Row,Column) -> Bool
+subgridInjective :: Sudoku -> Position -> Bool
 subgridInjective s (r,c) = injective vs where 
    vs = filter (/= 0) (subGrid s (r,c))
-
-nrcgridInjective :: Sudoku -> (Row,Column) -> Bool
-nrcgridInjective s (r,c) = injective vs where
-   vs = filter (/= 0) (subBlock s (r,c))
 
 consistent :: Sudoku -> Bool
 consistent s = and $
@@ -132,11 +171,8 @@ consistent s = and $
                   ++
                  [ subgridInjective s (r,c) | 
                       r <- [1,4,7], c <- [1,4,7]]
-		  ++
-		 [ nrcgridInjective s (r,c) |
-		      r <- [2, 6], c <- [2, 6]]
-
-extend :: Sudoku -> ((Row,Column),Value) -> Sudoku
+		  
+extend :: Sudoku -> (Position,Value) -> Sudoku
 extend = update
 
 update :: Eq a => (a -> b) -> (a,b) -> a -> b 
@@ -169,28 +205,24 @@ prune (r,c,v) ((x,y,zs):rest)
   | c == y = (x,y,zs\\[v]) : prune (r,c,v) rest
   | sameblock (r,c) (x,y) = 
         (x,y,zs\\[v]) : prune (r,c,v) rest
-  | nrcblock (r,c) (x,y) = (x,y,zs\\[v]) : prune (r,c,v) rest
   | otherwise = (x,y,zs) : prune (r,c,v) rest
   
-sameblock :: (Row,Column) -> (Row,Column) -> Bool
+sameblock :: Position -> Position -> Bool
 sameblock (r,c) (x,y) = bl r == bl x && bl c == bl y 
-
-nrcblock :: (Row, Column) -> (Row,Column) -> Bool
-nrcblock (r,c) (x,y) = nrcBl r == nrcBl x && nrcBl c == nrcBl y
 
 initNode :: Grid -> [Node]
 initNode gr = let s = grid2sud gr in 
               if (not . consistent) s then [] 
               else [(s, constraints s)]
 
-openPositions :: Sudoku -> [(Row,Column)]
+openPositions :: Sudoku -> [Position]
 openPositions s = [ (r,c) | r <- positions,  
                             c <- positions, 
                             s (r,c) == 0 ]
 
 constraints :: Sudoku -> [Constraint] 
 constraints s = sortBy length3rd 
-    [(r,c, freeAtPos s (r,c)) | 
+    [(r,c, freeAtPos s (r,c) (rowConstrnt ++ columnConstrnt ++ blockConstrnt)) | 
                        (r,c) <- openPositions s ]
 
 data Tree a = T a [Tree a] deriving (Eq,Ord,Show)
@@ -209,7 +241,7 @@ search :: (node -> [node])
 search children goal [] = []
 search children goal (x:xs) 
   | goal x    = x : search children goal xs
-  | otherwise = search children goal ((children x) ++ xs)
+  | otherwise = search children goal (children x ++ xs)
 
 solveNs :: [Node] -> [Node]
 solveNs = search succNode solved 
@@ -279,25 +311,23 @@ example5 = [[1,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,8,0],
             [0,0,0,0,0,0,0,0,9]]
 
-gridExercise1 :: Grid
-gridExercise1 = [[0,0,0,3,0,0,0,0,0],
-            [0,0,0,7,0,0,3,0,0],
-            [2,0,0,0,0,0,0,0,8],
-            [0,0,6,0,0,5,0,0,0],
-            [0,9,1,6,0,0,0,0,0],
-            [3,0,0,0,7,1,2,0,0],
-            [0,0,0,0,0,0,0,3,1],
-            [0,8,0,0,4,0,0,0,0],
-            [0,0,2,0,0,0,0,0,0]]
+example6 :: Grid
+example6 = [[0,0,0,0,5,0,0,0,0],
+            [9,0,6,0,0,0,3,0,0],
+            [0,0,0,4,0,9,0,0,0],
+            [0,1,0,0,0,0,0,5,0],
+            [2,0,0,6,0,7,0,0,1],
+            [0,4,0,0,0,0,0,9,0],
+            [0,0,0,7,0,1,0,0,0],
+            [0,0,9,0,0,0,2,0,6],
+            [0,0,0,0,3,0,0,0,0]]
 
-solution1 :: Grid
-solution1 = [[1, 4, 5, 9, 8, 2, 3, 6, 7],[6, 2, 7, 1, 3, 4, 9, 5, 8],[8, 9, 3, 7, 6, 5, 1, 4, 2],[3, 5, 1, 4, 9, 8, 2, 7, 6],[4, 6, 9, 2, 5, 7, 8, 3, 1],[7, 8, 2, 3, 1, 6, 5, 9, 4],[2, 3, 8, 6, 4, 9, 7, 1, 5],[9, 7, 6, 5, 2, 1, 4, 8, 3],[5, 1, 4, 8, 7, 3, 6, 2, 9]]
 
 emptyN :: Node
-emptyN = (\ _ -> 0,constraints (\ _ -> 0))
+emptyN = (const 0,constraints (const 0))
 
 getRandomInt :: Int -> IO Int
-getRandomInt n = getStdRandom (randomR (0,n))
+getRandomInt n = getStdRandom (randomR (0, n))
 
 getRandomItem :: [a] -> IO [a]
 getRandomItem [] = return []
@@ -322,10 +352,7 @@ getRandomCnstr cs = getRandomItem (f cs)
 
 rsuccNode :: Node -> IO [Node]
 rsuccNode (s,cs) = do xs <- getRandomCnstr cs
-                      if null xs 
-                      then return []
-                      else return 
-                          (extendNode (s,cs\\xs) (head xs))
+                      return (if null xs then [] else extendNode (s, cs \\ xs) (head xs))
 
 rsolveNs :: [Node] -> IO [Node]
 rsolveNs ns = rsearch rsuccNode solved (return ns)
@@ -360,21 +387,21 @@ uniqueSol node = singleton (solveNs [node]) where
   singleton [x] = True
   singleton (x:y:zs) = False
 
-eraseS :: Sudoku -> (Row,Column) -> Sudoku
+eraseS :: Sudoku -> Position -> Sudoku
 eraseS s (r,c) (x,y) | (r,c) == (x,y) = 0
                      | otherwise      = s (x,y)
 
-eraseN :: Node -> (Row,Column) -> Node
+eraseN :: Node -> Position -> Node
 eraseN n (r,c) = (s, constraints s) 
   where s = eraseS (fst n) (r,c) 
 
-minimalize :: Node -> [(Row,Column)] -> Node
+minimalize :: Node -> [Position] -> Node
 minimalize n [] = n
 minimalize n ((r,c):rcs) | uniqueSol n' = minimalize n' rcs
                          | otherwise    = minimalize n  rcs
   where n' = eraseN n (r,c)
 
-filledPositions :: Sudoku -> [(Row,Column)]
+filledPositions :: Sudoku -> [Position]
 filledPositions s = [ (r,c) | r <- positions,  
                               c <- positions, s (r,c) /= 0 ]
 
@@ -383,8 +410,6 @@ genProblem n = do ys <- randomize xs
                   return (minimalize n ys)
    where xs = filledPositions (fst n)
 
-main :: IO ()
-main = do [r] <- rsolveNs [emptyN]
-          showNode r
-          s  <- genProblem r
-          showNode s
+main :: IO [()]
+main = solveAndShow example6
+
