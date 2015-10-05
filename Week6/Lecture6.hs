@@ -4,6 +4,7 @@
   
   import Data.List
   import System.Random
+  import Data.Bits
 
   factors_naive :: Integer -> [Integer]
   factors_naive n = factors' n 2 where 
@@ -63,7 +64,9 @@
   expM x y = rem (x^y)
 
   exM :: Integer -> Integer -> Integer -> Integer
-  exM = expM -- to be replaced by a fast version
+  exM b 0 m = 1
+  exM b e m = t * exM ((b * b) `mod` m) (shiftR e 1) m `mod` m
+               where t = if testBit e 0 then b `mod` m else 1
 
   prime_test_F :: Integer -> IO Bool
   prime_test_F n = do 
