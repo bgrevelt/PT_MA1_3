@@ -1,24 +1,25 @@
   module Lecture6
-  
-  where 
-  
+
+  where
+
   import Data.List
+  import Data.Bits
   import System.Random
 
   factors_naive :: Integer -> [Integer]
-  factors_naive n = factors' n 2 where 
+  factors_naive n = factors' n 2 where
     factors' 1 _ = []
-    factors' n m 
+    factors' n m
       | n `mod` m == 0 = m : factors' (n `div` m) m
       | otherwise      =     factors' n (m+1)
 
   factors :: Integer -> [Integer]
-  factors n = let 
+  factors n = let
      ps = takeWhile (\m -> m^2 <= n) primes
-   in factors' n ps where 
+   in factors' n ps where
      factors' 1 _  = []
      factors' n [] = [n]
-     factors' n (p:ps) 
+     factors' n (p:ps)
       | n `mod` p == 0 = p: factors' (n `div` p) (p:ps)
       | otherwise      =    factors' n ps
 
@@ -26,7 +27,7 @@
   primes = 2 : filter isPrime [3..]
 
   m1  = 2^2-1;    m2  = 2^3-1;     m3  = 2^5-1
-  m4  = 2^7-1;    m5  = 2^13-1;    m6  = 2^17-1 
+  m4  = 2^7-1;    m5  = 2^13-1;    m6  = 2^17-1
   m7  = 2^19-1;   m8  = 2^31-1;    m9  = 2^61-1
   m10 = 2^89-1;   m11 = 2^107-1;   m12 = 2^127-1
   m13 = 2^521-1;  m14 = 2^607-1;   m15 = 2^1279-1
@@ -39,34 +40,36 @@
   addM x y = rem (x+y)
 
   multM :: Integer -> Integer -> Integer -> Integer
-  multM x y = rem (x*y) 
+  multM x y = rem (x*y)
 
   invM :: Integer -> Integer -> Integer
-  invM x n = let 
+  invM x n = let
      (u,v) = fct_gcd x n
      copr  = x*u + v*n == 1
-     i     = if signum u == 1 then u else u + n  
-   in 
+     i     = if signum u == 1 then u else u + n
+   in
      if copr then i else error "no inverse"
 
-  fct_gcd :: Integer -> Integer -> (Integer,Integer) 
-  fct_gcd a b = 
-    if b == 0 
-    then (1,0) 
-    else 
-       let 
+  fct_gcd :: Integer -> Integer -> (Integer,Integer)
+  fct_gcd a b =
+    if b == 0
+    then (1,0)
+    else
+       let
          (q,r) = quotRem a b
-         (s,t) = fct_gcd b r 
+         (s,t) = fct_gcd b r
        in (t, s - q*t)
 
   expM ::  Integer -> Integer -> Integer -> Integer
   expM x y = rem (x^y)
 
   exM :: Integer -> Integer -> Integer -> Integer
-  exM = expM -- to be replaced by a fast version
+  exM b 0 m = 1
+  exM b e m = t * exM ((b * b) `mod` m) (shiftR e 1) m `mod` m
+    		   where t = if testBit e 0 then b `mod` m else 1
 
   prime_test_F :: Integer -> IO Bool
-  prime_test_F n = do 
+  prime_test_F n = do
      a <- randomRIO (1, n-1) :: IO Integer
      return (exM a (n-1) n == 1)
 
@@ -82,77 +85,76 @@
   primeMR :: Int -> Integer -> IO Bool
   primeMR _ 2 = return True
   primeMR 0 _ = return True
-  primeMR k n = let 
-     (r,s) = decomp (n-1) 
-     f = \ x -> takeWhile (/= 1) 
+  primeMR k n = let
+     (r,s) = decomp (n-1)
+     f = \ x -> takeWhile (/= 1)
          (map (\ j -> exM x (2^j*s) n)  [0..r])
-    in 
-     do 
+    in
+     do
       a <- randomRIO (1, n-1) :: IO Integer
-      if exM a (n-1) n /= 1 
-        then return False 
-        else 
-          if exM a s n /= 1 && last (f a) /= (n-1) 
+      if exM a (n-1) n /= 1
+        then return False
+        else
+          if exM a s n /= 1 && last (f a) /= (n-1)
             then return False
             else primeMR (k-1) n
 
   encodeDH :: Integer -> Integer -> Integer -> Integer
   encodeDH p k m = m*k `mod` p
 
-  decodeDH :: Integer -> Integer -> Integer 
+  decodeDH :: Integer -> Integer -> Integer
            -> Integer -> Integer -> Integer
-  decodeDH p k ga b c = let 
-      gab' = exM ga ((p-1)-b) p 
-    in 
+  decodeDH p k ga b c = let
+      gab' = exM ga ((p-1)-b) p
+    in
       rem (c*gab') p
 
   encode :: Integer -> Integer -> Integer -> Integer
-  encode p k m = let 
+  encode p k m = let
      p' = p-1
      e  = head [ x | x <- [k..], gcd x p' == 1 ]
-   in 
+   in
      exM m e p
-  
+
   decode :: Integer -> Integer -> Integer -> Integer
-  decode p k m = let 
+  decode p k m = let
      p' = p-1
      e  = head [ x | x <- [k..], gcd x p' == 1 ]
-     d  = invM e p' 
-   in 
+     d  = invM e p'
+   in
      exM m d p
 
   cipher :: Integer -> Integer
   cipher = encode secret bound
-  
+
   decipher :: Integer -> Integer
   decipher = decode secret bound
 
   rsa_public :: Integer -> Integer -> (Integer,Integer)
-  rsa_public p q = let 
+  rsa_public p q = let
      n   = p * q
      phi = (p-1)*(q-1)
      e   = head [ x | x <- [3..], gcd x phi == 1 ]
-   in 
+   in
      (e,p*q)
 
-  rsa_private ::  Integer -> Integer 
+  rsa_private ::  Integer -> Integer
                   -> (Integer,Integer)
-  rsa_private p q = let 
+  rsa_private p q = let
      n = p * q
      phi = (p-1)*(q-1)
      e = head [ x | x <- [3..], gcd x phi == 1 ]
-     d = invM e phi 
-    in 
+     d = invM e phi
+    in
      (d,p*q)
 
-  rsa_encode :: (Integer,Integer) -> Integer -> Integer 
+  rsa_encode :: (Integer,Integer) -> Integer -> Integer
   rsa_encode (e,n) =  \ m -> exM m e n
 
   rsa_decode = rsa_encode
 
   trapdoor :: (Integer,Integer) -> Integer -> Integer
-  trapdoor = rsa_encode 
+  trapdoor = rsa_encode
 
   secret = m18
   bound  = 131
-

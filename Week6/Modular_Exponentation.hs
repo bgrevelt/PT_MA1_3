@@ -3,12 +3,6 @@ import Data.Bits
 import Lecture6
 -- https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/fast-modular-exponentiation
 -- https://www.youtube.com/watch?v=EHUgNLN8F1Y
-
-exMOpt :: Integer -> Integer -> Integer -> Integer
-exMOpt b 0 m = 1
-exMOpt b e m = t * exMOpt ((b * b) `mod` m) (shiftR e 1) m `mod` m
-  		   where t = if testBit e 0 then b `mod` m else 1
-
 {-
  Each time, we are going to double and add 1 to the base and the exponential.
 -}
