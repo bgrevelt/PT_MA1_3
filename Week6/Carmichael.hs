@@ -90,3 +90,22 @@ True
   tests as we are testing larger Carmichael numbers. Can we prove this numerically?
  --} 
  
+ {-- Some expderimental stuff after this to determine the percentage of numbers in the range [1..carmichael-1] which
+ are not coprime to the carmichael number for growing carmichael numbers. This is pretty CPU intersive, so let's see 
+ what we get after a night's run... --}
+ 
+factorOf :: (Integer,Integer,Integer) -> [Integer] -> [Integer]
+factorOf (fa,fb,fc) xs = filter (\x -> fa `divs` x || fb `divs` x || fc `divs` x) xs where
+    divs :: Integer -> Integer -> Bool
+    divs a b = b `mod` a == 0 
+    
+pcntFct :: Int -> Double
+pcntFct n = let (facs,c) = carmichael'!!n in
+    (realToFrac $ length $ factorOf facs [2..c]) / realToFrac c * 100.0
+    
+calcPercentages :: Int -> IO ()
+calcPercentages n = cp [0..n-1] where
+    cp [] = print "done"
+    cp (x:xs) = do
+        print $ (show x) ++ ": " ++ (show $ pcntFct x) ++ "%"
+        cp xs
