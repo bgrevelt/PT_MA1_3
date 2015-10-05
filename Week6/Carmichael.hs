@@ -40,7 +40,7 @@ testCarm' xs n = do
 "0% of carmichael numbers were incorrectly flagged as being prime when testing 10000 numbers in the range [1..prime-1]"
 
 It makes sense that these Carmichael numbers are often 'flagged' as being prime, as that was what they were designed for.
-The reason that we can, with due dilligence, mark them as non-integer is that the 'modular arithmetic congruence relation' 
+The reason that we can, with due dilligence, mark them as non-prime is that the 'modular arithmetic congruence relation' 
 only holds if the random number used by prime_test_F is not a coprime of the Carmichael number under test.
 
 If we change the functions above a little bit, we can clearly see this: 
