@@ -16,8 +16,7 @@ printTest :: [Integer] -> IO ()
 printTest (x : xs) = do
   a <- prime_tests_F 4 x
   print (a, x)
-  b <- printTest xs 
-  return b
+  printTest xs
 
 --
 -- What is the least composite number that you can find that fools the check, for prime_tests_F k with k=1,2,3?
