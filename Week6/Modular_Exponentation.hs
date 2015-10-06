@@ -21,6 +21,16 @@ import Lecture6
   True
   (0.11 secs, 4,663,464 bytes)
 
+  *Main> prime_test_F_Unoptimized m8
+
+  At some point, my macbook became very unresponsive.. The memory footprint was getting huge:
+
+  ghc	21,65 GB	   15,89 GB
+        ^             ^
+  [Memory usage] [Compressed memory]
+
+  I decided to stop this test after 15 minutes of running..
+
 
 -}
 testNaive :: IO ()
