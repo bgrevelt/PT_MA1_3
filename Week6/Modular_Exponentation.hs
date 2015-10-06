@@ -39,22 +39,32 @@ testNaive = do
 {-
   Because I want to test whether I had made an optimization, I decided to start where I left off
   with the naive method. It took way to long with the naive method to even calculate whether m8 is a prime. My
-  new method starts with m8 and goes all the way to m24 and it takes a stunning 7,53 for them all!
+  new method starts with m8 and goes all the way to m24 and it takes approximately 7~ seconds for m8 up to and including m24!
 
   *Main> testOptimized
-  "Testing for primes beginning with m10 to m20 with the optimized algorithm."
+  "Testing for primes beginning with m8 to m24 with the optimized algorithm."
   [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
-  (7.53 secs, 725,760,704 bytes)
+  (7.23 secs, 725,725,656 bytes)
 
   *Main> testOptimized
-  "Testing for primes beginning with m10 to m20 with the optimized algorithm."
+  "Testing for primes beginning with m8 to m24 with the optimized algorithm."
   [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
-  (7.63 secs, 725,589,416 bytes)
+  (7.07 secs, 724,880,920 bytes)
 
   *Main> testOptimized
-  "Testing for primes beginning with m10 to m20 with the optimized algorithm."
+  "Testing for primes beginning with m8 to m24 with the optimized algorithm."
   [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
-  (7.51 secs, 725,589,568 bytes)
+  (7.06 secs, 724,880,664 bytes)
+
+  *Main> testOptimized
+  "Testing for primes beginning with m8 to m24 with the optimized algorithm."
+  [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+  (7.17 secs, 724,880,376 bytes)
+
+  *Main> testOptimized
+  "Testing for primes beginning with m8 to m24 with the optimized algorithm."
+  [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+  (7.06 secs, 724,881,952 bytes)
 
 -}
 
@@ -77,5 +87,5 @@ testOptimized = do
             o <- (prime_test_F m22)
             p <- (prime_test_F m23)
             q <- (prime_test_F m24)
-            print "Testing for primes beginning with m10 to m20 with the optimized algorithm."
+            print "Testing for primes beginning with m8 to m24 with the optimized algorithm."
             print ([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q])
