@@ -109,3 +109,20 @@ calcPercentages n = cp [0..n-1] where
     cp (x:xs) = do
         print $ (show x) ++ ": " ++ (show $ pcntFct x) ++ "%"
         cp xs
+
+{--
+*Carmichael> calcPercentages 10
+"0: 4.915950259672768%"
+"1: 0.8676904796213669%"
+"2: 0.675786981732555%"
+"3: 0.596616214158226%"
+"4: 0.5533947932127754%"
+"5: 0.5435505125717432%"
+"6: 0.30490092160665044%"
+"7: 0.25207798310958957%"
+"8: 0.15652284038808148%"
+
+This run seems to suggest that our feeling is right. The percentage of numbers in the range [1..carmichael-1] which
+ are not coprime to the carmichael number gets lower as the carmichael number gets higher (at least if the first 9 of them)
+ 
+--}
