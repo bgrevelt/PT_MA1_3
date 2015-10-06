@@ -23,7 +23,14 @@ printTest (x : xs) = do
 -- What is the least composite number that you can find that fools the check, for prime_tests_F k with k=1,2,3?
 --
 
-{-- Gotta love random
+{-- 
+ "Where the check can go wrong is on classifying composite numbers; these can slip through the Fermat test."
+ "What is the least composite number that you can find that fools the check"
+ 
+ So: composite numbers can go wrong because they can slip through the test.
+ So: There exists a composite number that is smaller then all other composite numbers and passes the Fermat test
+ So: it's 4.
+ 
  For k = 1
    4
  For k = 2
