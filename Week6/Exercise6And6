@@ -52,4 +52,4 @@ exercise6_2 = mrMersenneTest primes
 mrMersenneTest (x : xs) = do
   a <- primeMR 20 (2^x-1)
   if a then print (a, x) else print ""
-  printTest xs
+  mrMersenneTest xs
