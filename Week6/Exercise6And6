@@ -1,0 +1,55 @@
+import Lecture6
+import Data.Text
+import Text.Printf
+import Data.Array.IO
+
+-- The function to generate Carmichael numbers as given in the assignment
+carmichael :: [Integer]
+carmichael = [ (6*k+1)*(12*k+1)*(18*k+1) | 
+    k <- [2..], 
+    isPrime (6*k+1), 
+    isPrime (12*k+1), 
+    isPrime (18*k+1) ]
+
+
+{- Findings: if you execute the Miller-Rabin primality test on the carmichael numbers (exercise6_1) it returns false. 
+So the carmichael numbers fool Fermat's primality check, but not the Miller-Rabin primality check.
+-}
+exercise6_1 =  mrTest carmichael
+mrTest :: [Integer] -> IO ()
+mrTest (x : xs) = do
+  a <- primeMR 20 (x)
+  print (a, x)
+  mrTest xs
+
+{- 	
+	if you feed the Miller-Rabin primality test with a list of primes and you do for every prime the following: 2^prime-1 
+	(exercise6_2) it returns the list below within 10 minutes. This corresponds with the mersenne primes on http://www.mersenne.org/primes
+
+
+	2^2-1, 
+	2^3-1, 
+	2^5-1, 
+	2^7-1, 
+	2^13-1, 
+	2^17-1, 
+	2^19-1, 
+	2^31-1, 
+	2^61-1, 
+	2^89-1, 
+	2^107-1, 
+	2^127-1, 
+	2^512-1, 
+	2^607-1, 
+	2^1279-1, 
+	2^2203-1, 
+	2^2281-1,
+	2^3217-1,
+	2^4253-1
+	2^4423-1
+-}
+exercise6_2 = mrMersenneTest primes
+mrMersenneTest (x : xs) = do
+  a <- primeMR 20 (2^x-1)
+  if a then print (a, x) else print ""
+  printTest xs
