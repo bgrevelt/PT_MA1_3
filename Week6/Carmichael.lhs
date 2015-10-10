@@ -3,8 +3,8 @@
 > import Lecture6
 
 The function to generate Carmichael numbers as given in the assignment
-carmichael :: [Integer]
 
+> carmichael :: [Integer]
 > carmichael = [ (6*k+1)*(12*k+1)*(18*k+1) | 
 >     k <- [2..], 
 >     isPrime (6*k+1), 
@@ -17,8 +17,8 @@ useful)
         Sidenote: Wouldn't it have been nicer if prime_tests_F would have picked n random numbers from the range [1..prime-1] 
         instead of generating a new random value each iteration? Now we have a chance of testing the same value multiple
         times. (Granted, with larger numbers this chance is pretty small)
-The test concludes by printing the percentage or tried Carmichael numbers that have been identified as a prime
-(or, to be fair, as a probable pime)
+The test concludes by printing the percentage of tried Carmichael numbers that have been identified as a prime
+(or, to be fair, as a probable prime)
 
 > testCarm :: Int -> Int -> IO ()
 > testCarm k = testCarm' (take k carmichael)
