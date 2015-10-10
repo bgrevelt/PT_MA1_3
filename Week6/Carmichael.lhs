@@ -27,7 +27,7 @@ The test concludes by printing the percentage of tried Carmichael numbers that h
 > testCarm' xs n = do
 >     r <- sequence $ fmap (prime_tests_F n) xs
 >     let 
->         pcntFail = (100 * (length $ filter id r) `div` (length r)) in
+>         pcntFail = 100 * (length $ filter id r) `div` (length r) in
 >         print (show pcntFail ++ "% of carmichael numbers were incorrectly flagged as being prime when testing " ++ show n ++ " numbers in the range [1..prime-1]")
         
 Some test output:
@@ -50,7 +50,7 @@ If we change the functions above a little bit, we can clearly see this:
 Carmichael numbers as before, but instead of only returning the number, also give us a tuple with the three primesused to create the number
        
 > carmichael' :: [((Integer,Integer, Integer), Integer)]
-> carmichael' = [ (((6*k+1),(12*k+1),(18*k+1)), (6*k+1)*(12*k+1)*(18*k+1)) | 
+> carmichael' = [ ((6*k+1,12*k+1,18*k+1), (6*k+1)*(12*k+1)*(18*k+1)) | 
 >     k <- [2..], 
 >     isPrime (6*k+1), 
 >     isPrime (12*k+1), 
@@ -61,14 +61,14 @@ Test all numbers in the range [1..prime-1] instead of one random number from tha
 Return a list of all numbers for which the test failed
 
 > failing_prime_test_F :: Integer -> [Integer]
-> failing_prime_test_F n = do 
+> failing_prime_test_F n = 
 >       [ a | a <- [1..(n-1)], (exM a (n-1) n /= 1)]
       
 Now, we can see for which a's exM a (n-1) n is not equal to n. Our expectancy is that all of these numbers are products of the
 factors of the Carmichael number that we put in. Let's make a function to check that
 
 > allFactorOf :: (Integer,Integer,Integer) -> [Integer] -> Bool
-> allFactorOf (fa,fb,fc) xs = all (\x -> fa `divs` x || fb `divs` x || fc `divs` x) xs where
+> allFactorOf (fa,fb,fc) = all (\x -> fa `divs` x || fb `divs` x || fc `divs` x) where
 >     divs :: Integer -> Integer -> Bool
 >     divs a b = b `mod` a == 0 
    
@@ -90,7 +90,7 @@ Filter all integers from a list of integers which are not factor of one of the i
 input tuple
 
 > factorOf :: (Integer,Integer,Integer) -> [Integer] -> [Integer]
-> factorOf (fa,fb,fc) xs = filter (\x -> fa `divs` x || fb `divs` x || fc `divs` x) xs where
+> factorOf (fa,fb,fc) = filter (\x -> fa `divs` x || fb `divs` x || fc `divs` x) where
 >     divs :: Integer -> Integer -> Bool
 >     divs a b = b `mod` a == 0 
     
@@ -99,7 +99,7 @@ of one of the prime factors of the Carmichael number.
 
 > pcntFct :: Int -> Double
 > pcntFct n = let (facs,c) = carmichael'!!n in
->     (realToFrac $ length $ factorOf facs [2..c]) / realToFrac c * 100.0
+>     realToFrac ( length $ factorOf facs [2..c]) / realToFrac c * 100.0
 
 Calculate the percentage of numbers in the range [2..'Carmichael number'] which are factors
 of one of the prime factors of the Carmichael number for the first n Carmichael numbers.  
@@ -108,7 +108,7 @@ of one of the prime factors of the Carmichael number for the first n Carmichael 
 > calcPercentages n = cp [0..n-1] where
 >     cp [] = print "done"
 >     cp (x:xs) = do
->         print $ (show x) ++ ": " ++ (show $ pcntFct x) ++ "%"
+>         print $ show x ++ ": " ++ show ( pcntFct x) ++ "%"
 >         cp xs
 
 Let's put this to the test. Out expectation is that the percentage will drop as the Carmichael
