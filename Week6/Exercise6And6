@@ -12,8 +12,13 @@ carmichael = [ (6*k+1)*(12*k+1)*(18*k+1) |
     isPrime (18*k+1) ]
 
 
-{- Findings: if you execute the Miller-Rabin primality test on the carmichael numbers (exercise6_1) it returns false. 
-So the carmichael numbers fool Fermat's primality check, but not the Miller-Rabin primality check.
+{- 
+Exercise 6 (the first exercise 6)
+Findings: if you execute the Miller-Rabin primality test on the carmichael numbers (exercise6_1) it returns false. 
+So the carmichael numbers easily fools the Fermat's primality check, but not that easy the Miller-Rabin primality check. In this case we 
+pass the parameter k the value 20. At least 3/4 of the bases k are witnesses for the compositeness of n. We could say that 
+the probabillity is 99,99999999990905%. The calculation for the probability is (4^20)/100 - 100). There is still the possibillity to give 
+a false positive. These are called Miller-Rabin pseudoprimes or strong pseudoprimes.
 -}
 exercise6_1 =  mrTest carmichael
 mrTest :: [Integer] -> IO ()
@@ -23,9 +28,12 @@ mrTest (x : xs) = do
   mrTest xs
 
 {- 	
+	Exercise 6 (the second exercise 6)
+
 	if you feed the Miller-Rabin primality test with a list of primes and you do for every prime the following: 2^prime-1 
 	(exercise6_2) it returns the list below within 10 minutes. This corresponds with the mersenne primes on http://www.mersenne.org/primes
-
+	
+	There is still the possibillity to give a false positive. These are called Miller-Rabin pseudoprimes or strong pseudoprimes.
 
 	2^2-1, 
 	2^3-1, 
