@@ -7,9 +7,6 @@ import System.Random
 import System.IO.Unsafe
 import Test.QuickCheck
 
---
--- Use this file as base for the assignments (lab) to have some more util and examples
---
 
 --
 -- Sets as defined by the capitals
@@ -273,14 +270,14 @@ testQuestion1 (x : xs) = do
 -- function for in-order traversal in right to left direction:
 inOrder :: Btree a -> [a]
 inOrder (Leaf) = []
-inOrder (B typ left right) = (inOrder left) ++ [typ] ++ (inOrder right)
+inOrder (B typ left right) = inOrder left ++ [typ] ++ inOrder right
 
 inOrderRev :: Btree a -> [a]
 inOrderRev t = reverse $ inOrder t 
 
 -- define a property that can be used to test the two functions by relating them to each other.
 treeProperty :: Eq a => Btree a -> Bool
-treeProperty t = (inOrder t == reverse (inOrderRev t))
+treeProperty t = inOrder t == reverse (inOrderRev t)
 
 --
 -- Question 3
@@ -318,8 +315,8 @@ stringTree3 = B ("c", "descC") (B ("b", "descB") Leaf Leaf) (B ("e", "descE") (B
 lookUp :: String -> Dict -> [String] 
 lookUp key (Leaf) = []
 lookUp key (B typ left right)
-  | (fst typ) == key = [snd typ] 
-  | (fst typ) > key  = lookUp key left
+  | fst typ == key   = [snd typ] 
+  | fst typ > key    = lookUp key left
   | otherwise        = lookUp key right
 
 -- Use inductive reasoning to show that your solution is correct.
@@ -331,8 +328,8 @@ lookUp key (B typ left right)
 insertLemma :: (String, String) -> Dict -> Dict
 insertLemma (lem, inf) (Leaf) = B (lem, inf) Leaf Leaf
 insertLemma (lem, inf) (B typ left right)
-  | (fst typ) == lem = error "Lemma already exists"
-  | (fst typ) > lem  = B typ (insertLemma (lem, inf) left) right 
+  | fst typ == lem   = error "Lemma already exists"
+  | fst typ > lem    = B typ (insertLemma (lem, inf) left) right 
   | otherwise        = B typ left (insertLemma (lem, inf) right)
 
 -- write an automated test procedure for checking whether an ordered dictionary is still ordered after the insertion.
@@ -346,3 +343,7 @@ insertLemma (lem, inf) (B typ left right)
 --assert :: (a -> b -> Bool) -> (a -> b) -> a -> b
 --assert p f x = let x’ = f x in
 --  if p x x’ then x’ else error "assert"
+
+--
+-- Question 6
+--
