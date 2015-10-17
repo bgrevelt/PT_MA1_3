@@ -1,12 +1,15 @@
+{-# OPTIONS_GHC -XFlexibleInstances #-}
 module Prep
 
 where
+
+-- -XFlexibleInstances
 
 import Data.List
 import System.Random
 import System.IO.Unsafe
 import Test.QuickCheck
-
+import Control.Monad
 
 --
 -- Sets as defined by the capitals
@@ -347,3 +350,63 @@ insertLemma (lem, inf) (B typ left right)
 --
 -- Question 6
 --
+
+
+
+--
+-- Example Quick Check
+--
+
+{--
+http://www.cse.chalmers.se/~rjmh/QuickCheck/manual_body.html#16
+data Tree = Leaf Int | Branch Tree Tree
+
+
+then a generator for trees might be defined by
+tree = oneof [liftM Leaf arbitrary,
+	      liftM2 Branch tree tree]
+
+However, there is always a risk that a recursive generator like this may fail to terminate, or produce very large results. 
+To avoid this, recursive generators should always use the size control mechanism. For example,
+
+tree = sized tree'
+tree' 0 = liftM Leaf arbitrary
+tree' n | n>0 = 
+	oneof [liftM Leaf arbitrary,
+	       liftM2 Branch subtree subtree]
+  where subtree = tree' (n `div` 2)
+
+--}
+
+--data Btree a = Leaf | B a (Btree a) (Btree a) deriving (Eq,Show)
+
+--tree = oneof [liftM Leaf,
+--	      liftM2 B arbitrary (tree arbitrary) (tree arbitrary)]
+
+
+
+instance Arbitrary a => Arbitrary (Btree a) where
+     arbitrary = sized gtree
+ 
+gtree 0 = return Leaf
+gtree n = do
+    x <- arbitrary 
+    t1 <- subtree
+    t2 <- subtree
+    return (B x t1 t2)
+  where subtree = gtree (n `div` 2)
+
+{--
+
+instance Arbitrary a =>  Arbitrary (Btree a) where
+  arbitrary = sized tree'
+    where
+      tree' 0 = return Leaf
+      tree' n | n > 0 = oneof [return Leaf, (liftM3 B arbitrary (subtree) (subtree))]
+        where subtree = tree' (n `div` 2)
+
+testFunc :: Btree a -> Bool
+testFunc n = True
+
+quickCheck testFunc
+--}
