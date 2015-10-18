@@ -410,3 +410,13 @@ testFunc n = True
 
 quickCheck testFunc
 --}
+
+newtype Rel a = Rel [(a,a)] deriving (Eq,Ord)
+
+instance Arbitrary (Rel Int) where 
+ arbitrary = sized $ \s ->
+   liftM Rel (vectorOf s re) where
+     re =  do
+       x1 <- choose(0, 10)
+       x2 <- choose(0, 10)
+       return (x1,x2)
